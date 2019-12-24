@@ -10,20 +10,29 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
 
   @spec post_form_with(%Plug.Conn{}, %{required(atom()) => term()}, String.t() | atom() | nil) ::
           %Plug.Conn{}
-  def(
-    post_form_with(%Plug.Conn{} = conn, attrs, entity \\ nil)
-    when is_binary(entity) or is_nil(entity) or is_atom(entity)
-  ) do
+  def post_form_with(%Plug.Conn{} = conn, attrs, entity \\ nil)
+      when is_binary(entity) or is_nil(entity) or is_atom(entity) do
     form = find_form(conn, entity)
     entity = to_string(entity)
 
     form
-    |> find_input_fields(entity)
+    |> find_inputs(entity)
     |> Enum.map(&input_to_tuple(&1, entity))
     |> update_input_values(attrs)
     |> prepend_entity(entity)
     |> send_to_action(form, conn)
   end
+
+  def find_inputs(form, "") do
+    fields = find_input_fields(form, "")
+    selects = find_selects(form, "")
+
+    Enum.uniq(fields ++ selects)
+  end
+
+  def find_inputs(form, entity), do: find_input_fields(form, entity)
+
+  defp find_selects(form, _), do: Floki.find(form, "select")
 
   defp find_input_fields(form, ""),
     do:
@@ -42,7 +51,16 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
         Map.put(acc, key, Map.get(attrs, key, value))
       end)
 
-  defp input_to_tuple(input, entity) do
+  defp input_to_tuple(input, entity), do: input |> elem(0) |> _input_to_tuple(input, entity)
+
+  defp _input_to_tuple("select", input, entity) do
+    key = key_for_input(input, entity)
+    value = input |> Floki.find("option[selected=selected]") |> attribute("value")
+
+    {key, value}
+  end
+
+  defp _input_to_tuple("input", input, entity) do
     value = attribute(input, "value")
     key = key_for_input(input, entity)
 
