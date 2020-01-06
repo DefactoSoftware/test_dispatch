@@ -4,7 +4,7 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   """
   @form_methods ["post", "put", "delete", "get"]
 
-  import DetroitWeb.TestHelpers, only: [attribute: 2, attribute: 3]
+  import DetroitWeb.TestHelpers, only: [attribute: 2, attribute: 3, parse_fragment: 1]
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
   alias DetroitWeb.Endpoint
 
@@ -97,6 +97,7 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   defp find_form(%Plug.Conn{status: status} = conn, nil) do
     conn
     |> html_response(status)
+    |> parse_fragment()
     |> Floki.find("form")
     |> List.last()
   end
@@ -104,6 +105,7 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   defp find_form(%Plug.Conn{status: status} = conn, entity) do
     conn
     |> html_response(status)
+    |> parse_fragment()
     |> Floki.find("form")
     |> Enum.find(fn form ->
       form
