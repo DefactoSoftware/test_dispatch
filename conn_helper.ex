@@ -53,6 +53,13 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
 
   defp input_to_tuple(input, entity), do: input |> elem(0) |> _input_to_tuple(input, entity)
 
+  defp _input_to_tuple("textarea", input, entity) do
+    key = key_for_input(input, entity)
+    value = Floki.text(input)
+
+    {key, value}
+  end
+
   defp _input_to_tuple("select", input, entity) do
     key = key_for_input(input, entity)
     value = input |> Floki.find("option[selected=selected]") |> attribute("value")
@@ -102,7 +109,7 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
     |> List.last()
   end
 
-  defp find_form(%Plug.Conn{status: status} = conn, entity) do
+  defp find_form(%Plug.Conn{status: status} = conn, entity) when status in 200..299 do
     conn
     |> html_response(status)
     |> parse_fragment()
@@ -113,4 +120,11 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
       |> Enum.any?()
     end)
   end
+
+  defp find_form(%Plug.Conn{status: status}, _),
+    do:
+      raise(
+        Plug.BadRequestError,
+        "The provided conn had the status #{status} that doesn't fall into the 2xx range"
+      )
 end
