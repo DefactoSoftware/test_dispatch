@@ -5,14 +5,14 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   @form_methods ["post", "put", "delete", "get"]
 
   import DetroitWeb.TestHelpers.ViewHelpers,
-    only: [attribute: 2, attribute: 3, parse_fragment: 1]
+    only: [attribute: 2, attribute: 3, parse_fragment: 1, find_test_selector: 2]
 
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
   alias DetroitWeb.Endpoint
 
   @spec post_form_with(%Plug.Conn{}, %{required(atom()) => term()}, String.t() | atom() | nil) ::
           %Plug.Conn{}
-  def post_form_with(%Plug.Conn{} = conn, attrs, entity \\ nil)
+  def post_form_with(%Plug.Conn{} = conn, %{} = attrs, entity \\ nil)
       when is_binary(entity) or is_nil(entity) or is_atom(entity) do
     form = find_form(conn, entity)
     entity = to_string(entity)
@@ -23,6 +23,11 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
     |> update_input_values(attrs)
     |> prepend_entity(entity)
     |> send_to_action(form, conn)
+  end
+
+  def post_form_with(%Plug.Conn{} = conn, test_selector, nil) do
+    form = find_form(conn, nil, test_selector)
+    send_to_action(%{}, form, conn)
   end
 
   def find_inputs(form, "") do
@@ -129,4 +134,12 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
         Plug.BadRequestError,
         "The provided conn had the status #{status} that doesn't fall into the 2xx range"
       )
+
+  defp find_form(%Plug.Conn{status: status} = conn, nil, test_selector) when status in 200..299 do
+    conn
+    |> html_response(status)
+    |> parse_fragment()
+    |> Floki.find("form")
+    |> Enum.find(&find_test_selector(&1, test_selector))
+  end
 end
