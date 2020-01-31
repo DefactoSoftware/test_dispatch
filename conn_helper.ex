@@ -10,9 +10,15 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
   alias DetroitWeb.Endpoint
 
-  @spec post_form_with(%Plug.Conn{}, %{required(atom()) => term()}, String.t() | atom() | nil) ::
+  @spec post_form_with(
+          %Plug.Conn{},
+          %{required(atom()) => term()} | binary,
+          String.t() | atom() | nil
+        ) ::
           %Plug.Conn{}
-  def post_form_with(%Plug.Conn{} = conn, %{} = attrs, entity \\ nil)
+  def post_form_with(conn, attrs_or_test_selector, entity \\ nil)
+
+  def post_form_with(%Plug.Conn{} = conn, %{} = attrs, entity)
       when is_binary(entity) or is_nil(entity) or is_atom(entity) do
     form = find_form(conn, entity)
     entity = to_string(entity)
