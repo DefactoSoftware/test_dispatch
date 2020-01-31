@@ -4,7 +4,9 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   """
   @form_methods ["post", "put", "delete", "get"]
 
-  import DetroitWeb.TestHelpers, only: [attribute: 2, attribute: 3, parse_fragment: 1]
+  import DetroitWeb.TestHelpers.ViewHelpers,
+    only: [attribute: 2, attribute: 3, parse_fragment: 1]
+
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
   alias DetroitWeb.Endpoint
 
