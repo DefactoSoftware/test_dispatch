@@ -5,9 +5,11 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   @form_methods ["post", "put", "delete", "get"]
 
   import DetroitWeb.TestHelpers.ViewHelpers,
-    only: [attribute: 2, attribute: 3, parse_fragment: 1, find_test_selector: 2]
+    only: [attribute: 2, attribute: 3, parse_fragment: 1]
 
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
+  import TestSelector.Test.FlokiHelpers
+
   alias DetroitWeb.Endpoint
 
   @spec post_form_with(
