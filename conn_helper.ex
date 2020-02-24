@@ -20,41 +20,42 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
       when is_binary(entity_or_test_selector) or
              is_nil(entity_or_test_selector) or
              is_atom(entity_or_test_selector) do
-    entity_or_test_selector_string = to_string(entity_or_test_selector)
-    form = find_form(conn, entity_or_test_selector_string)
+    {form, selector_type} = find_form(conn, entity_or_test_selector)
+    selector_tuple = {selector_type, entity_or_test_selector}
 
     form
-    |> find_inputs(entity_or_test_selector_string)
-    |> Enum.map(&input_to_tuple(&1, entity_or_test_selector_string))
+    |> find_inputs(selector_tuple)
+    |> Enum.map(&input_to_tuple(&1, selector_tuple))
     |> update_input_values(attrs)
-    |> prepend_entity(entity_or_test_selector_string)
+    |> prepend_entity(selector_tuple)
     |> send_to_action(form, conn)
   end
 
   def dispatch_form_with(conn, entity_or_test_selector, nil),
     do: dispatch_form_with(conn, %{}, entity_or_test_selector)
 
-  defp find_inputs(form, "") do
+  defp find_inputs(form, {:entity, _} = entity_tuple),
+    do: find_input_fields(form, entity_tuple)
+
+  defp find_inputs(form, _) do
     fields = find_input_fields(form, "")
     selects = find_selects(form, "")
 
     Enum.uniq(fields ++ selects)
   end
 
-  defp find_inputs(form, entity), do: find_input_fields(form, entity)
-
   defp find_selects(form, _), do: Floki.find(form, "select")
 
-  defp find_input_fields(form, ""),
+  defp find_input_fields(form, {:entity, entity}), do: Floki.find(form, "*[id^=#{entity}_]")
+
+  defp find_input_fields(form, _),
     do:
       form
       |> Floki.filter_out("input[type=hidden]")
       |> Floki.find("input")
 
-  defp find_input_fields(form, entity), do: Floki.find(form, "*[id^=#{entity}_]")
-
-  defp prepend_entity(attrs, ""), do: attrs
-  defp prepend_entity(attrs, entity), do: %{entity => attrs}
+  defp prepend_entity(attrs, {:entity, entity}), do: %{entity => attrs}
+  defp prepend_entity(attrs, _), do: attrs
 
   defp update_input_values(list, attrs),
     do:
@@ -62,27 +63,41 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
         Map.put(acc, key, Map.get(attrs, key, value))
       end)
 
-  defp input_to_tuple(input, entity), do: input |> elem(0) |> _input_to_tuple(input, entity)
+  defp input_to_tuple(input, entity_tuple),
+    do: input |> elem(0) |> _input_to_tuple(input, entity_tuple)
 
-  defp _input_to_tuple("textarea", input, entity) do
-    key = key_for_input(input, entity)
+  defp _input_to_tuple("textarea", input, entity_tuple) do
+    key = key_for_input(input, entity_tuple)
     value = Floki.text(input)
 
     {key, value}
   end
 
-  defp _input_to_tuple("select", input, entity) do
-    key = key_for_input(input, entity)
+  defp _input_to_tuple("select", input, entity_tuple) do
+    key = key_for_input(input, entity_tuple)
     value = input |> Floki.find("option[selected=selected]") |> attribute("value")
 
     {key, value}
   end
 
-  defp _input_to_tuple("input", input, entity) do
+  defp _input_to_tuple("input", input, entity_tuple) do
+    key = key_for_input(input, entity_tuple)
     value = attribute(input, "value")
-    key = key_for_input(input, entity)
 
     {key, value}
+  end
+
+  defp key_for_input(input, {:entity, entity}) do
+    input
+    |> attribute("id")
+    |> String.replace_leading("#{entity}_", "")
+    |> String.to_atom()
+  end
+
+  defp key_for_input(input, _) do
+    input
+    |> attribute("id")
+    |> String.to_atom()
   end
 
   defp send_to_action(params, form, conn) do
@@ -105,13 +120,6 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   defp downcase(nil), do: nil
   defp downcase(string), do: String.downcase(string)
 
-  defp key_for_input(input, entity) do
-    input
-    |> attribute("id")
-    |> String.replace_leading("#{entity}_", "")
-    |> String.to_atom()
-  end
-
   defp find_form(%Plug.Conn{status: status} = conn, entity_or_test_selector)
        when status in 200..299 do
     conn
@@ -128,10 +136,23 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
         "The provided conn had the status #{status} that doesn't fall into the 2xx range"
       )
 
-  defp find_form_by(form, ""), do: List.last(form)
+  defp find_form_by(form, nil), do: {List.last(form), nil}
 
   defp find_form_by(form, entity_or_test_selector) do
-    Enum.find(form, &find_test_selector(&1, entity_or_test_selector)) ||
+    test_selector_result = Enum.find(form, &find_test_selector(&1, entity_or_test_selector))
+
+    entity_result =
       Enum.find(form, &(&1 |> Floki.find("*[id^=#{entity_or_test_selector}_]") |> Enum.any?()))
+
+    cond do
+      is_tuple(test_selector_result) ->
+        {test_selector_result, :test_selector}
+
+      is_tuple(entity_result) ->
+        {entity_result, :entity}
+
+      true ->
+        raise("No form found for the given test_selector or entity: #{entity_or_test_selector}")
+    end
   end
 end
