@@ -12,15 +12,15 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
 
   alias DetroitWeb.Endpoint
 
-  @spec post_form_with(
+  @spec dispatch_form_with(
           %Plug.Conn{},
           %{required(atom()) => term()} | binary,
           String.t() | atom() | nil
         ) ::
           %Plug.Conn{}
-  def post_form_with(conn, attrs_or_test_selector, entity \\ nil)
+  def dispatch_form_with(conn, attrs_or_test_selector, entity \\ nil)
 
-  def post_form_with(%Plug.Conn{} = conn, %{} = attrs, entity)
+  def dispatch_form_with(%Plug.Conn{} = conn, %{} = attrs, entity)
       when is_binary(entity) or is_nil(entity) or is_atom(entity) do
     form = find_form(conn, entity)
     entity = to_string(entity)
@@ -33,19 +33,19 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
     |> send_to_action(form, conn)
   end
 
-  def post_form_with(%Plug.Conn{} = conn, test_selector, nil) do
+  def dispatch_form_with(%Plug.Conn{} = conn, test_selector, nil) do
     form = find_form(conn, nil, test_selector)
     send_to_action(%{}, form, conn)
   end
 
-  def find_inputs(form, "") do
+  defp find_inputs(form, "") do
     fields = find_input_fields(form, "")
     selects = find_selects(form, "")
 
     Enum.uniq(fields ++ selects)
   end
 
-  def find_inputs(form, entity), do: find_input_fields(form, entity)
+  defp find_inputs(form, entity), do: find_input_fields(form, entity)
 
   defp find_selects(form, _), do: Floki.find(form, "select")
 
