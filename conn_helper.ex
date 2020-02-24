@@ -12,7 +12,7 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
 
   alias DetroitWeb.Endpoint
 
-  @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary | atom() | nil) ::
+  @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary() | atom() | nil) ::
           %Plug.Conn{}
   def dispatch_form_with(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
 
