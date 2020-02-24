@@ -90,7 +90,7 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   defp key_for_input(input, {:entity, entity}) do
     input
     |> attribute("id")
-    |> String.replace_leading("#{entity}_", "")
+    |> String.replace_prefix("#{entity}_", "")
     |> String.to_atom()
   end
 
