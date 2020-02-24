@@ -12,31 +12,27 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
 
   alias DetroitWeb.Endpoint
 
-  @spec dispatch_form_with(
-          %Plug.Conn{},
-          %{required(atom()) => term()} | binary,
-          String.t() | atom() | nil
-        ) ::
+  @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary | atom() | nil) ::
           %Plug.Conn{}
-  def dispatch_form_with(conn, attrs_or_test_selector, entity \\ nil)
+  def dispatch_form_with(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
 
-  def dispatch_form_with(%Plug.Conn{} = conn, %{} = attrs, entity)
-      when is_binary(entity) or is_nil(entity) or is_atom(entity) do
-    form = find_form(conn, entity)
-    entity = to_string(entity)
+  def dispatch_form_with(%Plug.Conn{} = conn, %{} = attrs, entity_or_test_selector)
+      when is_binary(entity_or_test_selector) or
+             is_nil(entity_or_test_selector) or
+             is_atom(entity_or_test_selector) do
+    entity_or_test_selector_string = to_string(entity_or_test_selector)
+    form = find_form(conn, entity_or_test_selector_string)
 
     form
-    |> find_inputs(entity)
-    |> Enum.map(&input_to_tuple(&1, entity))
+    |> find_inputs(entity_or_test_selector_string)
+    |> Enum.map(&input_to_tuple(&1, entity_or_test_selector_string))
     |> update_input_values(attrs)
-    |> prepend_entity(entity)
+    |> prepend_entity(entity_or_test_selector_string)
     |> send_to_action(form, conn)
   end
 
-  def dispatch_form_with(%Plug.Conn{} = conn, test_selector, nil) do
-    form = find_form(conn, nil, test_selector)
-    send_to_action(%{}, form, conn)
-  end
+  def dispatch_form_with(conn, entity_or_test_selector, nil),
+    do: dispatch_form_with(conn, %{}, entity_or_test_selector)
 
   defp find_inputs(form, "") do
     fields = find_input_fields(form, "")
@@ -116,24 +112,13 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
     |> String.to_atom()
   end
 
-  defp find_form(%Plug.Conn{status: status} = conn, nil) do
+  defp find_form(%Plug.Conn{status: status} = conn, entity_or_test_selector)
+       when status in 200..299 do
     conn
     |> html_response(status)
     |> parse_fragment()
     |> Floki.find("form")
-    |> List.last()
-  end
-
-  defp find_form(%Plug.Conn{status: status} = conn, entity) when status in 200..299 do
-    conn
-    |> html_response(status)
-    |> parse_fragment()
-    |> Floki.find("form")
-    |> Enum.find(fn form ->
-      form
-      |> Floki.find("*[id^=#{entity}_]")
-      |> Enum.any?()
-    end)
+    |> find_form_by(entity_or_test_selector)
   end
 
   defp find_form(%Plug.Conn{status: status}, _),
@@ -143,11 +128,10 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
         "The provided conn had the status #{status} that doesn't fall into the 2xx range"
       )
 
-  defp find_form(%Plug.Conn{status: status} = conn, nil, test_selector) when status in 200..299 do
-    conn
-    |> html_response(status)
-    |> parse_fragment()
-    |> Floki.find("form")
-    |> Enum.find(&find_test_selector(&1, test_selector))
+  defp find_form_by(form, ""), do: List.last(form)
+
+  defp find_form_by(form, entity_or_test_selector) do
+    Enum.find(form, &find_test_selector(&1, entity_or_test_selector)) ||
+      Enum.find(form, &(&1 |> Floki.find("*[id^=#{entity_or_test_selector}_]") |> Enum.any?()))
   end
 end
