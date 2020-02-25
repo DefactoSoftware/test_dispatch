@@ -4,12 +4,14 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
   """
   @form_methods ["post", "put", "delete", "get"]
 
+  # TODO: use floki's functions instead
   import DetroitWeb.TestHelpers.ViewHelpers,
     only: [attribute: 2, attribute: 3, parse_fragment: 1]
 
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
   import TestSelector.Test.FlokiHelpers
 
+  # TODO: should use the project's endpoint here
   alias DetroitWeb.Endpoint
 
   @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary() | atom() | nil) ::
