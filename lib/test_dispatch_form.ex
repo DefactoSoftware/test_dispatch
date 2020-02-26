@@ -1,6 +1,8 @@
 defmodule TestDispatchForm do
   @moduledoc """
-  A module that contains functions that makes writing tests easier.
+  A module that contains a function to test the dispatch of forms. This will
+  make it easier to write integration tests to check if forms in Phoenix
+  templates will submit to the intended controller action with the right params.
   """
   @form_methods ["post", "put", "delete", "get"]
 
@@ -14,6 +16,22 @@ defmodule TestDispatchForm do
   # TODO: should use the project's endpoint here
   alias DetroitWeb.Endpoint
 
+  @doc """
+  Will find a form in the HTML response of the given conn by entity or by
+  `TestSelecor`, or, if no entity or test_selector is provided, it will target
+  the last form found in the response.
+
+  Next it will look for form controls (inputs, selects), convert these to params
+  and use the attributes passed to `dispatch_form_with/3` to update the values
+  of the params. The params will now only contain field keys found in the
+  controls of the form.
+
+  If an entity is given, the params will be prepended by this entity.
+
+  Ultimately, the conn is dispatched to the given endpoint using
+  `Phoenix.ConnTest.dispatch/5`, with the params and with the method and action
+  found in the form.
+  """
   @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary() | atom() | nil) ::
           %Plug.Conn{}
   def dispatch_form_with(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
