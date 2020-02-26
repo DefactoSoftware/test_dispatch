@@ -1,4 +1,4 @@
-defmodule TestDispatchForm.TestHelpers.ConnHelper do
+defmodule TestDispatchForm do
   @moduledoc """
   A module that contains functions that makes writing tests easier.
   """
