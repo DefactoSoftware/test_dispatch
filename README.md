@@ -31,7 +31,6 @@ be found at [https://hexdocs.pm/test_dispatch_form](https://hexdocs.pm/test_disp
 Import TestDispatchForm in your test module or your test case and you can call
 `dispatch_form_with/3` from there.
 
-
 ```elixir
 defmodule Project.Web.MyTest do
   import TestDispatchForm
