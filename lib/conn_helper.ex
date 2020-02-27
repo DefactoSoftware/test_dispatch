@@ -117,7 +117,7 @@ defmodule TestDispatchForm.TestHelpers.ConnHelper do
   defp downcase(string), do: String.downcase(string)
 
   defp find_form(%Plug.Conn{status: status} = conn, entity_or_test_selector)
-       when status in 200..299 do
+       when status in 200..299 or status == 401 do
     conn
     |> html_response(status)
     |> Floki.parse_fragment!()
@@ -129,7 +129,8 @@ defmodule TestDispatchForm.TestHelpers.ConnHelper do
     do:
       raise(
         Plug.BadRequestError,
-        "The provided conn had the status #{status} that doesn't fall into the 2xx range"
+        "The provided conn had the status #{status} that doesn't fall into the 2xx range. \
+        And is not 401"
       )
 
   defp find_form_by(form, nil), do: {List.last(form), nil}
