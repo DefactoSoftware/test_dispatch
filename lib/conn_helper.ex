@@ -129,7 +129,8 @@ defmodule TestDispatchForm.TestHelpers.ConnHelper do
     do:
       raise(
         Plug.BadRequestError,
-        "The provided conn had the status #{status} that doesn't fall into the 2xx range"
+        "The provided conn had the status #{status} that doesn't fall into the 2xx range. \
+        And is not 401"
       )
 
   defp find_form_by(form, nil), do: {List.last(form), nil}
