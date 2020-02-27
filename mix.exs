@@ -32,7 +32,7 @@ defmodule TestDispatchForm.MixProject do
       maintainers: ["Marcel Horlings", "Pien van Dalen"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/DefactoSoftware/test_dispatch_form"
+        "GitHub" => "https://github.com/DefactoSoftware/test_dispatch_form",
         "Docs" => "http://hexdocs.pm/test_dispatch_form/"
       }
     ]
