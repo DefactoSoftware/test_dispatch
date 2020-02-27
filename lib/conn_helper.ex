@@ -120,7 +120,7 @@ defmodule TestDispatchForm.TestHelpers.ConnHelper do
        when status in 200..299 or status == 401 do
     conn
     |> html_response(status)
-    |> Floki.parse_fragment!()
+    |> Floki.parse_document!()
     |> Floki.find("form")
     |> find_form_by(entity_or_test_selector)
   end
