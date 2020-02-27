@@ -7,9 +7,10 @@ defmodule TestDispatchForm.MixProject do
       version: "0.1.0",
       elixir: "~> 1.8",
       description: "Helper to test the dispatch of Phoenix forms in Elixir applications",
-      start_permanent: Mix.env() == :prod,
+      start_permanent: Mix.env() == :test,
       package: package(),
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: ["lib"]
     ]
   end
 
@@ -23,7 +24,7 @@ defmodule TestDispatchForm.MixProject do
     [
       {:floki, "~> 0.26.0"},
       {:phoenix, "~> 1.4"},
-      {:test_selector, "~> 0.3.0"}
+      {:test_selector, "~> 0.3.0", only: :test}
     ]
   end
 

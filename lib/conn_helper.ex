@@ -1,18 +1,12 @@
-defmodule DetroitWeb.TestHelpers.ConnHelper do
+defmodule TestDispatchForm.TestHelpers.ConnHelper do
   @moduledoc """
   A module that contains functions that makes writing tests easier.
   """
   @form_methods ["post", "put", "delete", "get"]
-
-  # TODO: use floki's functions instead
-  import DetroitWeb.TestHelpers.ViewHelpers,
-    only: [attribute: 2, attribute: 3, parse_fragment: 1]
+  @endpoint Application.get_env(:test_dispatch_form, :endpoint)
 
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
   import TestSelector.Test.FlokiHelpers
-
-  # TODO: should use the project's endpoint here
-  alias DetroitWeb.Endpoint
 
   @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary() | atom() | nil) ::
           %Plug.Conn{}
@@ -77,47 +71,47 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
 
   defp _input_to_tuple("select", input, entity_tuple) do
     key = key_for_input(input, entity_tuple)
-    value = input |> Floki.find("option[selected=selected]") |> attribute("value")
+    value = input |> Floki.find("option[selected=selected]") |> floki_attribute("value")
 
     {key, value}
   end
 
   defp _input_to_tuple("input", input, entity_tuple) do
     key = key_for_input(input, entity_tuple)
-    value = attribute(input, "value")
+    value = floki_attribute(input, "value")
 
     {key, value}
   end
 
   defp key_for_input(input, {:entity, entity}) do
     input
-    |> attribute("id")
+    |> floki_attribute("id")
     |> String.replace_prefix("#{entity}_", "")
     |> String.to_atom()
   end
 
   defp key_for_input(input, _) do
     input
-    |> attribute("id")
+    |> floki_attribute("id")
     |> String.to_atom()
   end
 
   defp send_to_action(params, form, conn) do
-    action = attribute(form, "action")
+    action = floki_attribute(form, "action")
     method = get_method_of_form(form)
 
-    dispatch(conn, Endpoint, method, action, params)
+    dispatch(conn, @endpoint, method, action, params)
   end
 
   defp get_method_of_form(form),
     do:
       form
-      |> attribute("input[name=_method]", "value")
+      |> floki_attribute("input[name=_method]", "value")
       |> downcase
       |> method(form)
 
   defp method(method, _) when method in @form_methods, do: method
-  defp method(_, form), do: attribute(form, "method") || "post"
+  defp method(_, form), do: floki_attribute(form, "method") || "post"
 
   defp downcase(nil), do: nil
   defp downcase(string), do: String.downcase(string)
@@ -126,7 +120,7 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
        when status in 200..299 do
     conn
     |> html_response(status)
-    |> parse_fragment()
+    |> Floki.parse_fragment!()
     |> Floki.find("form")
     |> find_form_by(entity_or_test_selector)
   end
@@ -157,4 +151,11 @@ defmodule DetroitWeb.TestHelpers.ConnHelper do
         raise("No form found for the given test_selector or entity: #{entity_or_test_selector}")
     end
   end
+
+  @spec floki_attribute(Floki.html_tree(), binary, binary() | nil | none()) :: binary() | nil
+  defp floki_attribute(html, select, name \\ nil)
+  defp floki_attribute(html, select, nil), do: html |> Floki.attribute(select) |> List.first()
+
+  defp floki_attribute(html, select, name),
+    do: html |> Floki.attribute(select, name) |> List.first()
 end
