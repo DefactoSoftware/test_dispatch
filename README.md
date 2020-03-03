@@ -28,33 +28,35 @@ be found at [https://hexdocs.pm/test_dispatch_form](https://hexdocs.pm/test_disp
 
 ## Use
 
-`dispatch_form_with/3` will use the conn's `private.phoenix_endpoint` as endpoint
-to dispatch the form to. So if you have a test case where you set the default
-endpoint for testing with Phoenix, then you can define the endpoint for your tests
-there:
-
-```elixir
-defmodule MyApp.ConnCase do
-  use ExUnit.CaseTemplate
-
-  using do
-    quote do
-      # The default endpoint for testing
-      @endpoint MyApp.Endpoint
-    end
-  end
-end
-```
-
 Import TestDispatchForm in your test module or your test case and you can call
 `dispatch_form_with/3` from there.
 
+To use `dispatch_form_with/3` a request has to be made to a page where a form is
+present. The conn that is received will be parsed by the `dispatch_form_with/3`
+and the form will be dispatched with the attributes that are given or the
+default values when they are not given.
+
 ```elixir
-defmodule Project.Web.MyTest do
+defmodule MyAppWeb.MyTest do
+  use MyAppWeb.ConnCase
   import TestDispatchForm
 
-  test "dispatches form" do
-    TestDispatchForm.dispatch_form_with(conn, %{name: "John Doe", email: "john@doe.com"}, :user)
+  test "dispatches form with attributes and entity" do
+    conn = build_conn()
+
+    assert conn
+           |> get(Routes.user_path(conn, :new))
+           |> dispatch_form_with(%{name: "John Doe", email: "john@doe.com"}, :user)
+           |> redirected_to(Routes.user_path(conn, :index))
+  end
+
+  test "dispatches form with default values and test_selector" do
+    conn = build_conn()
+
+    assert conn
+           |> get(Routes.user_path(conn, :index))
+           |> dispatch_form_with(User.IndexView.test_selector("batch-action"))
+           |> html_response(200)
   end
 end
 ```
@@ -72,7 +74,7 @@ the form.
 If an entity is given, the params will be prepended by this entity. So for:
 
 ```elixir
-TestDispatchForm.dispatch_form_with(conn, %{name: "John Doe", email: "john@doe.com"}, :user)
+dispatch_form_with(conn, %{name: "John Doe", email: "john@doe.com"}, :user)
 ```
 
 this will result in the following params:
