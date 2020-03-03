@@ -5,10 +5,47 @@ defmodule TestDispatchForm do
   templates will submit to the intended controller action with the right params.
   """
   @form_methods ["post", "put", "delete", "get"]
-  @endpoint Application.get_env(:test_dispatch_form, :endpoint)
 
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
   import TestSelector.Test.FlokiHelpers
+
+  defmacro __using__(_) do
+    quote do
+      import TestDispatchForm
+    end
+  end
+
+  @doc """
+  Dispatches a form with attributes.
+
+  See `dispatch_form_with/4` for more information.
+  """
+  defmacro dispatch_form_with(conn, attrs, entity_or_test_selector) do
+    quote do
+      dispatch_form_with(
+        unquote(conn),
+        @endpoint,
+        unquote(attrs),
+        unquote(entity_or_test_selector)
+      )
+    end
+  end
+
+  @doc """
+  Dispatches a form with no attributes.
+
+  See `dispatch_form_with/4` for more information.
+  """
+  defmacro dispatch_form_with(conn, entity_or_test_selector) do
+    quote do
+      dispatch_form_with(
+        unquote(conn),
+        @endpoint,
+        unquote(Macro.escape(%{})),
+        unquote(entity_or_test_selector)
+      )
+    end
+  end
 
   @doc """
   Will find a form in the HTML response of the given conn by entity or by
@@ -26,14 +63,20 @@ defmodule TestDispatchForm do
   `Phoenix.ConnTest.dispatch/5`, with the params and with the method and action
   found in the form.
   """
-  @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary() | atom() | nil) ::
-          %Plug.Conn{}
-  def dispatch_form_with(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
 
-  def dispatch_form_with(%Plug.Conn{} = conn, %{} = attrs, entity_or_test_selector)
+  # @spec dispatch_form_with(
+  #         %Plug.Conn{},
+  #         %{required(atom()) => term()},
+  #         binary() | atom() | nil
+  #       ) ::
+  #         %Plug.Conn{}
+
+  def dispatch_form_with(%Plug.Conn{} = conn, endpoint, %{} = attrs, entity_or_test_selector)
       when is_binary(entity_or_test_selector) or
              is_nil(entity_or_test_selector) or
              is_atom(entity_or_test_selector) do
+    if is_nil(endpoint), do: raise("No @endpoint set in test case")
+
     {form, selector_type} = find_form(conn, entity_or_test_selector)
     selector_tuple = {selector_type, entity_or_test_selector}
 
@@ -42,11 +85,8 @@ defmodule TestDispatchForm do
     |> Enum.map(&input_to_tuple(&1, selector_tuple))
     |> update_input_values(attrs)
     |> prepend_entity(selector_tuple)
-    |> send_to_action(form, conn)
+    |> send_to_action(form, conn, endpoint)
   end
-
-  def dispatch_form_with(conn, entity_or_test_selector, nil),
-    do: dispatch_form_with(conn, %{}, entity_or_test_selector)
 
   defp find_inputs(form, {:entity, _} = entity_tuple),
     do: find_input_fields(form, entity_tuple)
@@ -114,11 +154,11 @@ defmodule TestDispatchForm do
     |> String.to_atom()
   end
 
-  defp send_to_action(params, form, conn) do
+  defp send_to_action(params, form, conn, endpoint) do
     action = floki_attribute(form, "action")
     method = get_method_of_form(form)
 
-    dispatch(conn, @endpoint, method, action, params)
+    dispatch(conn, endpoint, method, action, params)
   end
 
   defp get_method_of_form(form),
