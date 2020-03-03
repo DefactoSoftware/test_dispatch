@@ -22,9 +22,9 @@ defmodule TestDispatchForm do
 
   If an entity is given, the params will be prepended by this entity.
 
-  Ultimately, the conn is dispatched to the either the application config
-  `:endpoint` or the conn's endpoint using `Phoenix.ConnTest.dispatch/5`, with
-  the params and with the method and action found in the form.
+  Ultimately, the conn is dispatched to the conn's `private.phoenix_endpoint`
+  using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
+  action found in the form.
   """
   @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary() | atom() | nil) ::
           %Plug.Conn{}
@@ -34,7 +34,6 @@ defmodule TestDispatchForm do
       when is_binary(entity_or_test_selector) or
              is_nil(entity_or_test_selector) or
              is_atom(entity_or_test_selector) do
-    endpoint = retrieve_endpoint(conn)
     {form, selector_type} = find_form(conn, entity_or_test_selector)
     selector_tuple = {selector_type, entity_or_test_selector}
 
@@ -43,14 +42,11 @@ defmodule TestDispatchForm do
     |> Enum.map(&input_to_tuple(&1, selector_tuple))
     |> update_input_values(attrs)
     |> prepend_entity(selector_tuple)
-    |> send_to_action(form, conn, endpoint)
+    |> send_to_action(form, conn)
   end
 
   def dispatch_form_with(conn, entity_or_test_selector, nil),
     do: dispatch_form_with(conn, %{}, entity_or_test_selector)
-
-  defp retrieve_endpoint(conn),
-    do: Application.get_env(:test_dispatch_form, :endpoint) || endpoint_module(conn)
 
   defp find_inputs(form, {:entity, _} = entity_tuple),
     do: find_input_fields(form, entity_tuple)
@@ -119,8 +115,9 @@ defmodule TestDispatchForm do
   end
 
   defp send_to_action(params, form, conn, endpoint) do
-    action = floki_attribute(form, "action")
+    endpoint = endpoint_module(conn)
     method = get_method_of_form(form)
+    action = floki_attribute(form, "action")
 
     dispatch(conn, endpoint, method, action, params)
   end

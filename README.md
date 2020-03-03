@@ -28,10 +28,10 @@ be found at [https://hexdocs.pm/test_dispatch_form](https://hexdocs.pm/test_disp
 
 ## Use
 
-`dispatch_form_with/3` will use the conn's `private.phoenix_endpoint` by default
-as endpoint to dispatch the form to. So if you have a test case where you set
-the default endpoint for testing with Phoenix, then you can define the endpoint
-for your tests there:
+`dispatch_form_with/3` will use the conn's `private.phoenix_endpoint` as endpoint
+to dispatch the form to. So if you have a test case where you set the default
+endpoint for testing with Phoenix, then you can define the endpoint for your tests
+there:
 
 ```elixir
 defmodule MyApp.ConnCase do
@@ -44,13 +44,6 @@ defmodule MyApp.ConnCase do
     end
   end
 end
-```
-
-You can also set the `:endpoint` in your config settings and this will override
-the use of the `conn.private.phoenix_endpoint` as endpoint:
-
-```elixir
-config :test_dispatch_form, :endpoint, MyApp.Endpoint
 ```
 
 Import TestDispatchForm in your test module or your test case and you can call
@@ -88,6 +81,6 @@ this will result in the following params:
 %{"user" => %{name: "John Doe", email: "john@doe.com"}}
 ```
 
-Ultimately, the conn is dispatched to the either the application config
-`:endpoint` or the conn's endpoint using `Phoenix.ConnTest.dispatch/5`, with
-the params and with the method and action found in the form.
+Ultimately, the conn is dispatched to the conn's `private.phoenix_endpoint`
+using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
+action found in the form.
