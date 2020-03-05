@@ -10,7 +10,7 @@ defmodule TestDispatchForm.MixProject do
       start_permanent: Mix.env() == :test,
       package: package(),
       deps: deps(),
-      elixirc_paths: ["lib"]
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -18,6 +18,10 @@ defmodule TestDispatchForm.MixProject do
   def application do
     [extra_applications: [:logger]]
   end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
