@@ -24,7 +24,7 @@ defmodule TestDispatchForm.MixProject do
     [
       {:floki, "~> 0.26.0"},
       {:phoenix, "~> 1.4"},
-      {:test_selector, "~> 0.3.0", only: :test}
+      {:test_selector, "~> 0.3.0"}
     ]
   end
 

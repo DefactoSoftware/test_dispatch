@@ -114,7 +114,7 @@ defmodule TestDispatchForm do
     |> String.to_atom()
   end
 
-  defp send_to_action(params, form, conn, endpoint) do
+  defp send_to_action(params, form, conn) do
     endpoint = endpoint_module(conn)
     method = get_method_of_form(form)
     action = floki_attribute(form, "action")
