@@ -7,13 +7,17 @@ defmodule TestDispatchFormTest do
         name: "John Doe",
         email: "john@doe.com",
         description: "Just a regular joe",
-        roles: ["Admin", "moderator"]
+        roles: ["Admin", "moderator"],
+        non_existing_field: "This will not show up in the params"
       }
 
       %Plug.Conn{params: params} =
-        conn = conn |> get("/users/new") |> dispatch_form_with(attrs, :user)
+        dispatched_conn =
+        conn
+        |> get("/users/new", %{form: "entity_and_form_controls"})
+        |> dispatch_form_with(attrs, :user)
 
-      assert html_response(conn, 200) == "user created"
+      assert html_response(dispatched_conn, 200) == "user created"
 
       assert params == %{
                "user" => %{
@@ -25,10 +29,23 @@ defmodule TestDispatchFormTest do
              }
     end
 
-    test "dispatches form with attributes that do not comply with the form controls" do
-    end
+    test "dispatches form without attributes", %{conn: conn} do
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/new", %{form: "entity_and_form_controls"})
+        |> dispatch_form_with(:user)
 
-    test "dispatches form without attributes" do
+      assert html_response(dispatched_conn, 200) == "not all required params are set"
+
+      assert params == %{
+               "user" => %{
+                 "description" => "",
+                 "email" => nil,
+                 "name" => nil,
+                 "roles" => nil
+               }
+             }
     end
 
     test "dispatches form with form controls that do not have the entity in it's id" do

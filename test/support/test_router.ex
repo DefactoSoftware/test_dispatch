@@ -6,10 +6,10 @@ defmodule TestDispatchFormTest.Router do
     plug(:put_bypass, :browser)
   end
 
-  scope "/users" do
+  scope "/" do
     pipe_through(:browser)
-    get("/new", Controller, :new)
-    post("/create", Controller, :create)
+    get("/users/new", Controller, :new)
+    post("/users/create", Controller, :create)
   end
 
   def put_bypass(conn, pipeline) do
