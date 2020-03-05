@@ -124,24 +124,76 @@ defmodule TestDispatchFormTest do
   end
 
   describe "form without entity or test_selector and empty form controls" do
-    test "dispatches form with attributes" do
+    test "dispatches the last form in the HTML response with attributes", %{conn: conn} do
+      attrs = %{
+        name: "John Doe",
+        email: "john@doe.com",
+        description: "Just a regular joe",
+        roles: ["admin"],
+        non_existing_field: "This will not show up in the params"
+      }
+
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/new", %{form: "only_form_controls"})
+        |> dispatch_form_with(attrs)
+
+      assert html_response(dispatched_conn, 200) == "user created"
+
+      assert params == %{
+               "description" => "Just a regular joe",
+               "email" => "john@doe.com",
+               "name" => "John Doe",
+               "roles" => ["admin"]
+             }
     end
 
-    test "dispatches form with attributes that do not comply with the form controls" do
-    end
+    test "dispatches the last form in the HTML response without attributes", %{conn: conn} do
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/new", %{form: "only_form_controls"})
+        |> dispatch_form_with(%{})
 
-    test "dispatches form without attributes" do
-    end
+      assert html_response(dispatched_conn, 200) == "not all required params are set"
 
-    test "dispatches form with form controls of type 'input', 'textarea' and 'select'" do
+      assert params == %{
+               "description" => "",
+               "email" => nil,
+               "name" => nil,
+               "roles" => nil
+             }
     end
   end
 
   describe "form without entity or test_selector and no form controls" do
-    test "dispatches form without attributes" do
+    test "dispatches the last form in the HTML response without attributes", %{conn: conn} do
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/index")
+        |> dispatch_form_with()
+
+      assert html_response(dispatched_conn, 200) == "users exported"
+      assert params == %{}
     end
 
-    test "dispatches form and given attributes are ignored" do
+    test "dispatches the last form in the HTML response and given attributes are ignored",
+         %{conn: conn} do
+      attrs = %{
+        non_existing_field: "This will not show up in the params",
+        another_one: "This one won't either"
+      }
+
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/index")
+        |> dispatch_form_with(attrs)
+
+      assert html_response(dispatched_conn, 200) == "users exported"
+      assert params == %{}
     end
   end
 
