@@ -47,9 +47,6 @@ defmodule TestDispatchFormTest do
                }
              }
     end
-
-    test "dispatches form with form controls that do not have the entity in it's id" do
-    end
   end
 
   describe "form with entity and no form controls" do
@@ -104,12 +101,34 @@ defmodule TestDispatchFormTest do
     end
   end
 
-  test "raise when trying to find a form by test_selector while there is none" do
+  test "raise when trying to find a form by test_selector while there is none", %{conn: conn} do
+    conn = get(conn, "/users/new", %{form: "only_form_controls"})
+
+    assert_raise(
+      RuntimeError,
+      "No form found for the given test_selector or entity: new-user",
+      fn ->
+        dispatch_form_with(conn, "new-user")
+      end
+    )
   end
 
-  test "raise when trying to find a form by entity while there is none" do
+  test "raise when trying to find a form by entity while there is none", %{conn: conn} do
+    conn = get(conn, "/users/new", %{form: "only_form_controls"})
+
+    assert_raise(RuntimeError, "No form found for the given test_selector or entity: user", fn ->
+      dispatch_form_with(conn, :user)
+    end)
   end
 
-  test "raise if no form is found in the HTML response" do
+  test "raise if no form is found in the HTML response", %{conn: conn} do
+    conn =
+      conn
+      |> Plug.Conn.put_resp_content_type("text/html")
+      |> Plug.Conn.resp(200, "no form here")
+
+    assert_raise(RuntimeError, "No form found for the given test_selector or entity: user", fn ->
+      dispatch_form_with(conn, :user)
+    end)
   end
 end
