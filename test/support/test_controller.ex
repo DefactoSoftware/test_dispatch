@@ -5,6 +5,11 @@ defmodule TestDispatchFormTest.Controller do
 
   def init(opts), do: opts
 
+  def call(conn, :index) do
+    body = File.read!("test/support/forms/_test_selector_and_no_form_controls.html")
+    set_html_resp(conn, 200, body)
+  end
+
   def call(%{params: %{"form" => form}} = conn, :new) do
     body = File.read!("test/support/forms/_#{form}.html")
     set_html_resp(conn, 200, body)
@@ -14,6 +19,10 @@ defmodule TestDispatchFormTest.Controller do
     if has_all_required_params?(params),
       do: set_html_resp(conn, 200, "user created"),
       else: set_html_resp(conn, 200, "not all required params are set")
+  end
+
+  def call(conn, :export) do
+    set_html_resp(conn, 200, "users exported")
   end
 
   defp set_html_resp(conn, status, body),

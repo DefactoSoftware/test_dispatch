@@ -8,8 +8,10 @@ defmodule TestDispatchFormTest.Router do
 
   scope "/" do
     pipe_through(:browser)
+    get("/users/index", Controller, :index)
     get("/users/new", Controller, :new)
     post("/users/create", Controller, :create)
+    post("/users/export", Controller, :export)
   end
 
   def put_bypass(conn, pipeline) do

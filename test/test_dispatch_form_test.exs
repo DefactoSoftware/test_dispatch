@@ -49,14 +49,6 @@ defmodule TestDispatchFormTest do
     end
   end
 
-  describe "form with entity and no form controls" do
-    test "dispatches form without attributes" do
-    end
-
-    test "dispatches form and given attributes are ignored" do
-    end
-  end
-
   describe "form with test_selector and empty form controls" do
     test "dispatches form with attributes" do
     end
@@ -72,10 +64,31 @@ defmodule TestDispatchFormTest do
   end
 
   describe "form with test_selector and no form controls" do
-    test "dispatches form without attributes" do
+    test "dispatches form without attributes", %{conn: conn} do
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/index")
+        |> dispatch_form_with("export-users")
+
+      assert html_response(dispatched_conn, 200) == "users exported"
+      assert params == %{}
     end
 
-    test "dispatches form and given attributes are ignored" do
+    test "dispatches form and given attributes are ignored", %{conn: conn} do
+      attrs = %{
+        non_existing_field: "This will not show up in the params",
+        another_one: "This one won't either"
+      }
+
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/index")
+        |> dispatch_form_with(attrs, "export-users")
+
+      assert html_response(dispatched_conn, 200) == "users exported"
+      assert params == %{}
     end
   end
 
