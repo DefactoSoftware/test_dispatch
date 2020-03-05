@@ -54,11 +54,14 @@ defmodule TestDispatchForm do
   defp find_inputs(form, _) do
     fields = find_input_fields(form, "")
     selects = find_selects(form, "")
+    textareas = find_textareas(form, "")
 
-    Enum.uniq(fields ++ selects)
+    Enum.uniq(fields ++ selects ++ textareas)
   end
 
   defp find_selects(form, _), do: Floki.find(form, "select")
+
+  defp find_textareas(form, _), do: Floki.find(form, "textarea")
 
   defp find_input_fields(form, {:entity, entity}), do: Floki.find(form, "*[id^=#{entity}_]")
 

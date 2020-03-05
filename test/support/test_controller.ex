@@ -15,7 +15,13 @@ defmodule TestDispatchFormTest.Controller do
     set_html_resp(conn, 200, body)
   end
 
-  def call(%{params: %{"user" => %{}} = params} = conn, :create) do
+  def call(%{params: %{"user" => %{} = user_params}} = conn, :create) do
+    if has_all_required_params?(user_params),
+      do: set_html_resp(conn, 200, "user created"),
+      else: set_html_resp(conn, 200, "not all required params are set")
+  end
+
+  def call(%{params: params} = conn, :create) do
     if has_all_required_params?(params),
       do: set_html_resp(conn, 200, "user created"),
       else: set_html_resp(conn, 200, "not all required params are set")
@@ -28,7 +34,7 @@ defmodule TestDispatchFormTest.Controller do
   defp set_html_resp(conn, status, body),
     do: conn |> put_resp_content_type("text/html") |> resp(status, body)
 
-  defp has_all_required_params?(%{"user" => user_params}) do
+  defp has_all_required_params?(user_params) do
     !Enum.any?(user_params, fn {p, v} ->
       p in @required_user_params and (is_nil(v) or v == "")
     end)

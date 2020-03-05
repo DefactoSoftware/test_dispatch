@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+  <title>New user</title>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+  <div>
+    <h1>New user</h1>
+    <form action="/users/create" method="post" test-selector="new-user">
+      <input name="_csrf_token" type="hidden" value="AHIqJmEUAxIvGy4HJ3oUGCMjChsLYBZ-SGgy7W1HElh3PKLsffgXXQO6">
+
+      <label>Name</label>
+      <input id="name" label="Name" name="name" type="text">
+
+      <label>Email</label>
+      <input id="email" label="Email" name="email" type="email">
+
+      <label>Description</label>
+      <textarea id="description" label="Description" name="description" type="textarea"></textarea>
+
+      <select id="roles" name="roles">
+        <option value="">Select a role</option>
+        <option value="admin">Admin</option>
+        <option value="moderator">Moderator</option>
+      </select>
+
+      <button type="submit">Create new user</button>
+    </form>
+  </div>
+</body>
+</html>
