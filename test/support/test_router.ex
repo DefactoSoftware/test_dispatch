@@ -1,5 +1,6 @@
 defmodule TestDispatchFormTest.Router do
   use Phoenix.Router
+  use Plug.ErrorHandler
   alias TestDispatchFormTest.Controller
 
   pipeline :browser do
@@ -17,5 +18,11 @@ defmodule TestDispatchFormTest.Router do
   def put_bypass(conn, pipeline) do
     bypassed = (conn.assigns[:bypassed] || []) ++ [pipeline]
     Plug.Conn.assign(conn, :bypassed, bypassed)
+  end
+
+  def handle_errors(conn, params) do
+    super(conn, params)
+
+    send_resp(conn, conn.status, "Something went wrong: #{inspect(params)}")
   end
 end
