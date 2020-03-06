@@ -35,8 +35,9 @@ defmodule TestDispatchFormTest.Controller do
     do: conn |> put_resp_content_type("text/html") |> resp(status, body)
 
   defp has_all_required_params?(user_params) do
-    !Enum.any?(user_params, fn {p, v} ->
-      p in @required_user_params and (is_nil(v) or v == "")
-    end)
+    required_subset_of_given_params = Map.take(user_params, @required_user_params)
+
+    Enum.count(required_subset_of_given_params) == Enum.count(@required_user_params) and
+      Enum.all?(required_subset_of_given_params, fn {_, v} -> is_binary(v) and v != "" end)
   end
 end

@@ -21,9 +21,9 @@ defmodule TestDispatchFormTest do
 
       assert params == %{
                "user" => %{
-                 "description" => "Just a regular joe",
-                 "email" => "john@doe.com",
                  "name" => "John Doe",
+                 "email" => "john@doe.com",
+                 "description" => "Just a regular joe",
                  "roles" => ["admin", "moderator"]
                }
              }
@@ -40,10 +40,33 @@ defmodule TestDispatchFormTest do
 
       assert params == %{
                "user" => %{
-                 "description" => "",
-                 "email" => nil,
                  "name" => nil,
+                 "email" => nil,
+                 "description" => "",
                  "roles" => nil
+               }
+             }
+    end
+
+    test "dispatches form which is lacking the required form controls", %{conn: conn} do
+      attrs = %{
+        name: "John Doe",
+        email: "john@doe.com",
+        description: "Just a regular joe",
+        roles: ["admin", "moderator"]
+      }
+
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/new", %{form: "lacking_required_form_controls"})
+        |> dispatch_form_with(attrs, :user)
+
+      assert html_response(dispatched_conn, 200) == "not all required params are set"
+
+      assert params == %{
+               "user" => %{
+                 "description" => "Just a regular joe"
                }
              }
     end
@@ -69,9 +92,9 @@ defmodule TestDispatchFormTest do
       assert html_response(dispatched_conn, 200) == "user created"
 
       assert params == %{
-               "description" => "Just a regular joe",
-               "email" => "john@doe.com",
                "name" => "John Doe",
+               "email" => "john@doe.com",
+               "description" => "Just a regular joe",
                "roles" => ["admin"]
              }
     end
@@ -86,9 +109,9 @@ defmodule TestDispatchFormTest do
       assert html_response(dispatched_conn, 200) == "not all required params are set"
 
       assert params == %{
-               "description" => "",
-               "email" => nil,
                "name" => nil,
+               "email" => nil,
+               "description" => "",
                "roles" => nil
              }
     end
@@ -142,9 +165,9 @@ defmodule TestDispatchFormTest do
       assert html_response(dispatched_conn, 200) == "user created"
 
       assert params == %{
-               "description" => "Just a regular joe",
-               "email" => "john@doe.com",
                "name" => "John Doe",
+               "email" => "john@doe.com",
+               "description" => "Just a regular joe",
                "roles" => ["admin"]
              }
     end
@@ -159,9 +182,9 @@ defmodule TestDispatchFormTest do
       assert html_response(dispatched_conn, 200) == "not all required params are set"
 
       assert params == %{
-               "description" => "",
-               "email" => nil,
                "name" => nil,
+               "email" => nil,
+               "description" => "",
                "roles" => nil
              }
     end
