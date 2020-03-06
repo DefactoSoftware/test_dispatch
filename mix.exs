@@ -14,6 +14,7 @@ defmodule TestDispatchForm.MixProject do
       source_url: "https://github.com/DefactoSoftware/test_dispatch_form",
       start_permanent: Mix.env() == :test,
       test_coverage: [tool: ExCoveralls],
+      dialyzer: [plt_add_apps: [:mix, :ex_unit], check_plt: true],
       version: "0.1.0"
     ]
   end
