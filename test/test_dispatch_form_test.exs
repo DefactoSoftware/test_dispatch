@@ -29,6 +29,31 @@ defmodule TestDispatchFormTest do
              }
     end
 
+    test "dispatches form with not all required attributes", %{conn: conn} do
+      attrs = %{
+        email: "john@doe.com",
+        description: "Just a regular joe",
+        roles: ["admin", "moderator"]
+      }
+
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/new", %{form: "entity_and_form_controls"})
+        |> dispatch_form_with(attrs, :user)
+
+      assert html_response(dispatched_conn, 200) == "not all required params are set"
+
+      assert params == %{
+               "user" => %{
+                 "name" => nil,
+                 "email" => "john@doe.com",
+                 "description" => "Just a regular joe",
+                 "roles" => ["admin", "moderator"]
+               }
+             }
+    end
+
     test "dispatches form without attributes", %{conn: conn} do
       %Plug.Conn{params: params} =
         dispatched_conn =
