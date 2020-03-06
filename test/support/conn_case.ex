@@ -21,10 +21,12 @@ defmodule TestDispatchForm.ConnCase do
     end
   end
 
-  setup do
+  setup_all do
     TestDispatchFormTest.Endpoint.start_link()
-    Logger.disable(self())
-
     {:ok, conn: Phoenix.ConnTest.build_conn()}
+  end
+
+  setup do
+    Logger.disable(self())
   end
 end
