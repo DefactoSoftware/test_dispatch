@@ -12,7 +12,7 @@ defmodule TestDispatchForm do
 
   @doc """
   Will find a form in the HTML response of the given conn by entity or by
-  `TestSelecor`, or, if no entity or test_selector is provided, it will target
+  `TestSelector`, or, if no entity or test_selector is provided, it will target
   the last form found in the response.
 
   Next it will look for form controls (inputs, selects), convert these to params
@@ -26,8 +26,8 @@ defmodule TestDispatchForm do
   using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
   action found in the form.
   """
-  @spec dispatch_form_with(%Plug.Conn{}, %{required(atom()) => term()}, binary() | atom() | nil) ::
-          %Plug.Conn{}
+  @spec dispatch_form_with(Plug.Conn.t(), %{required(atom()) => term()}, binary() | atom() | nil) ::
+          Plug.Conn.t()
   def dispatch_form_with(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
 
   def dispatch_form_with(%Plug.Conn{} = conn, %{} = attrs, entity_or_test_selector)
