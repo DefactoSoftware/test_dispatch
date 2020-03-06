@@ -81,7 +81,7 @@ defmodule TestDispatchForm do
       end)
 
   defp input_to_tuple(input, entity_tuple),
-    do: input |> elem(0) |> _input_to_tuple(input, entity_tuple)
+    do: input |> elem(0) |> _input_to_tuple([input], entity_tuple)
 
   defp _input_to_tuple("textarea", input, entity_tuple) do
     key = key_for_input(input, entity_tuple)
@@ -174,7 +174,8 @@ defmodule TestDispatchForm do
     end
   end
 
-  @spec floki_attribute(Floki.html_tree(), binary, binary() | nil | none()) :: binary() | nil
+  @spec floki_attribute(binary | Floki.html_tree(), binary, binary() | nil | none()) ::
+          binary() | nil
   defp floki_attribute(html, select, name \\ nil)
   defp floki_attribute(html, select, nil), do: html |> Floki.attribute(select) |> List.first()
 

@@ -15,11 +15,17 @@ jobs:
           keys:
             - v1-dependency-cache-{{ checksum "mix.lock" }}
             - v1-dependency-cache
+      - restore_cache:
+          keys:
+            - v2-plt-cache-{{ checksum "mix.lock" }}
+            - v2-plt-cache
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - run: mix deps.get
       - run: mix compile --warnings-as-errors
       - run: mix credo
+      - run: mix dialyzer --plt
+      - run: mix dialyzer --list-unused-filters
       - run: mix coveralls.json
       - run: bash <(curl -s https://codecov.io/bash) -t "$CODECOV_KEY"
       - save_cache:
@@ -27,4 +33,10 @@ jobs:
           paths:
             - deps
             - _build
+            - ~/.mix
+      - save_cache:
+          key: v2-plt-cache-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+            - priv/plts
             - ~/.mix
