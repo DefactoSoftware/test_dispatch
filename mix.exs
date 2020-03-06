@@ -4,19 +4,23 @@ defmodule TestDispatchForm.MixProject do
   def project do
     [
       app: :test_dispatch_form,
-      version: "0.1.0",
-      elixir: "~> 1.8",
-      description: "Helper to test the dispatch of Phoenix forms in Elixir applications",
-      start_permanent: Mix.env() == :test,
-      package: package(),
       deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      description: "Helper to test the dispatch of Phoenix forms in Elixir applications",
+      elixir: "~> 1.8",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      name: "TestDispatchForm",
+      package: package(),
+      preferred_cli_env: [coveralls: :test, "coveralls.detail": :test],
+      source_url: "https://github.com/DefactoSoftware/test_dispatch_form",
+      start_permanent: Mix.env() == :test,
+      test_coverage: [tool: ExCoveralls],
+      version: "0.1.0"
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    [extra_applications: [:logger]]
+    []
   end
 
   # Specifies which paths to compile per environment.
@@ -26,6 +30,9 @@ defmodule TestDispatchForm.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 0.5", only: [:dev, :test]},
+      {:excoveralls, "~> 0.7", only: :test},
       {:floki, "~> 0.26.0"},
       {:phoenix, "~> 1.4"},
       {:test_selector, "~> 0.3.0"}

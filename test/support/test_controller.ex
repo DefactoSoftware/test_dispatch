@@ -1,4 +1,5 @@
 defmodule TestDispatchFormTest.Controller do
+  @moduledoc false
   import Plug.Conn, only: [put_resp_content_type: 2, resp: 3]
 
   @required_user_params ~w(name email)s
