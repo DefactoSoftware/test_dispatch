@@ -54,11 +54,14 @@ defmodule TestDispatchForm do
   defp find_inputs(form, _) do
     fields = find_input_fields(form, "")
     selects = find_selects(form, "")
+    textareas = find_textareas(form, "")
 
-    Enum.uniq(fields ++ selects)
+    Enum.uniq(fields ++ selects ++ textareas)
   end
 
   defp find_selects(form, _), do: Floki.find(form, "select")
+
+  defp find_textareas(form, _), do: Floki.find(form, "textarea")
 
   defp find_input_fields(form, {:entity, entity}), do: Floki.find(form, "*[id^=#{entity}_]")
 
@@ -114,7 +117,7 @@ defmodule TestDispatchForm do
     |> String.to_atom()
   end
 
-  defp send_to_action(params, form, conn, endpoint) do
+  defp send_to_action(params, form, conn) do
     endpoint = endpoint_module(conn)
     method = get_method_of_form(form)
     action = floki_attribute(form, "action")
