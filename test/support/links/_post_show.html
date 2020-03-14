@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <title>Post 1</title>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+  <div>
+    <h1>Post</h1>
+    <a href="/posts/1" data-method="delete" test-selector="post-123-delete-post" test-value="1">
+     Remove
+    </a>
+    <table>
+      <thead>
+        <th>Author</td>
+        <th>Comment</td>
+        <th>Upvote</td>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Jan Jansen</td>
+          <td>This is perfect</td>
+          <td>
+            <a href="/posts/1/comments/1"
+               data-method="post"
+               test-value="1"
+               test-selector="post-123-upvote-comment" >
+              Upvote Comment
+          </td>
+        </tr>
+        <tr>
+          <td>John Doe</td>
+          <td>Another comment</td>
+          <td>
+            <a href="/posts/1/comments/2"
+               data-method="post"
+               test-value="2"
+               test-selector="post-123-upvote-comment" >
+              Upvote Comment
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

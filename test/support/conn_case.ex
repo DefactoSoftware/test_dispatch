@@ -1,4 +1,4 @@
-defmodule TestDispatchForm.ConnCase do
+defmodule TestDispatch.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -14,7 +14,7 @@ defmodule TestDispatchForm.ConnCase do
       Application.put_env(:test_dispatch_form, TestDispatchFormTest.Endpoint, [])
 
       import Phoenix.ConnTest
-      import TestDispatchForm
+      import TestDispatch
       import TestDispatchFormTest.Endpoint
 
       @endpoint TestDispatchFormTest.Endpoint
