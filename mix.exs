@@ -5,6 +5,7 @@ defmodule TestDispatchForm.MixProject do
     [
       app: :test_dispatch_form,
       deps: deps(),
+      docs: docs(),
       description: "Helper to test the dispatch of Phoenix forms in Elixir applications",
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -49,6 +50,17 @@ defmodule TestDispatchForm.MixProject do
         "GitHub" => "https://github.com/DefactoSoftware/test_dispatch_form",
         "Docs" => "http://hexdocs.pm/test_dispatch_form/"
       }
+    ]
+  end
+
+  defp docs do
+    [
+      extra_section: "GUIDES",
+      formatters: ["html", "epub"],
+      extras: ["guides/testing-with-test-dispatch.md"],
+      groups_for_extras: [
+        "How to": "guides/testing-with-test-dispatch.md"
+      ]
     ]
   end
 end
