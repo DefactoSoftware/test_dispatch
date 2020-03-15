@@ -1,7 +1,7 @@
 # Testing with TestDispatch
 
-This library was build to test if forms and links have the expected results in
-controller tests.
+This library was built to test if forms and links have the expected results in
+controller tests when they would be dispatched.
 
 It can be used with or without
 [TestSelector](https://github.com/DefactoSoftware/TestSelector)
@@ -35,7 +35,7 @@ We will explain the workings with the following form.
 
 This form is shown on `/admin/users/new` the entity for this form is `user`.
 
-To post the form as is we can use the following code.
+To post the form as is we can use the following code:
 
 ```elixir
 conn
@@ -44,20 +44,20 @@ conn
 |> html_response(422) =~ "can't be blank"
 ```
 
-There is now a request made to the router with the method `POST` to the action
-`/admin/users/create` and with the params %{name: "", email: "", description:
-"", roles: ""}
+A request is made to the router here with the method `POST` to the action
+`/admin/users/create` and with the params `%{name: "", email: "", description:
+"", roles: ""}`
 
 The `dispatch_form_with/3` will return a conn with the response of the
-controller in this case it has returned an error because all fields are left
+controller. In this case it has returned an error because all fields are left
 blank.
 
 To update the fields while posting, a map can be given that matches the fields.
 
 ```elixir
 params = %{
-  name: Pien,
-  email: pien@exmaple.com,
+  name: "Marcel",
+  email: "marcel@example.com",
   description: "Securing this place",
   role: "moderator"
 }
@@ -71,6 +71,5 @@ conn
 Now that the params are given each key is matched to the keys in the form and
 updated with the value that is provided. If the keys do not match they won't be
 posted.
-
 
 
