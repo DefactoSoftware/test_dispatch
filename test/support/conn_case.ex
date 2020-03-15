@@ -11,18 +11,18 @@ defmodule TestDispatch.ConnCase do
 
   using do
     quote do
-      Application.put_env(:test_dispatch_form, TestDispatchFormTest.Endpoint, [])
+      Application.put_env(:test_dispatch_form, TestDispatchTest.Endpoint, [])
 
       import Phoenix.ConnTest
       import TestDispatch
-      import TestDispatchFormTest.Endpoint
+      import TestDispatchTest.Endpoint
 
-      @endpoint TestDispatchFormTest.Endpoint
+      @endpoint TestDispatchTest.Endpoint
     end
   end
 
   setup_all do
-    TestDispatchFormTest.Endpoint.start_link()
+    TestDispatchTest.Endpoint.start_link()
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 

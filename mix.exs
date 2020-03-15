@@ -1,4 +1,4 @@
-defmodule TestDispatchForm.MixProject do
+defmodule TestDispatch.MixProject do
   use Mix.Project
 
   def project do
@@ -8,7 +8,7 @@ defmodule TestDispatchForm.MixProject do
       description: "Helper to test the dispatch of Phoenix forms in Elixir applications",
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
-      name: "TestDispatchForm",
+      name: "TestDispatch",
       package: package(),
       preferred_cli_env: [coveralls: :test, "coveralls.detail": :test],
       source_url: "https://github.com/DefactoSoftware/test_dispatch_form",

@@ -1,4 +1,4 @@
-defmodule TestDispatchFormTest do
+defmodule TestDispatch.FormTest do
   use TestDispatch.ConnCase
 
   describe "form with entity and empty form controls" do

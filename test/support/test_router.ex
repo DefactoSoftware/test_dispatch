@@ -1,7 +1,7 @@
-defmodule TestDispatchFormTest.Router do
+defmodule TestDispatchTest.Router do
   use Phoenix.Router
   use Plug.ErrorHandler
-  alias TestDispatchFormTest.{Controller, Post, PostController}
+  alias TestDispatchTest.{Controller, Post, PostController}
 
   pipeline :browser do
     plug(:put_bypass, :browser)

@@ -1,4 +1,4 @@
-defmodule TestDispatchFormTest.PostController do
+defmodule TestDispatchTest.PostController do
   @moduledoc false
   import Phoenix.Controller
   import Plug.Conn, only: [put_resp_content_type: 2, resp: 3]

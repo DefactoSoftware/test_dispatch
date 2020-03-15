@@ -1,4 +1,4 @@
-defmodule TestDispatchFormTest.Post.CommentController do
+defmodule TestDispatchTest.Post.CommentController do
   @moduledoc false
   import Phoenix.Controller
 
