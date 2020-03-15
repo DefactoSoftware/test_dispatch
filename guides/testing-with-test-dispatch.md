@@ -3,8 +3,8 @@
 This library was built to test if forms and links have the expected results in
 controller tests when they would be dispatched.
 
-It can be used with or without
-[TestSelector](https://github.com/DefactoSoftware/TestSelector)
+It can be used with or without the implementation of
+[TestSelector](https://github.com/DefactoSoftware/TestSelector).
 
 ## Testing a form
 
@@ -45,8 +45,8 @@ conn
 ```
 
 A request is made to the router here with the method `POST` to the action
-`/admin/users/create` and with the params `%{name: "", email: "", description:
-"", roles: ""}`
+`/admin/users/create` and with the params `%{"user" => %{"name" => "",
+"email" => "", "description" => "", "roles" => ""}}`
 
 The `dispatch_form_with/3` will return a conn with the response of the
 controller. In this case it has returned an error because all fields are left
@@ -72,4 +72,27 @@ Now that the params are given each key is matched to the keys in the form and
 updated with the value that is provided. If the keys do not match they won't be
 posted.
 
+### TestSelector
 
+Some forms can be created that only have a submit button and cannot be found
+with an entity. In this we can use `TestSelector` to find the form and dispatch
+it.
+
+```html
+<form action="admin/posts/1" method="delete" test-selector="posts-123-delete-post">
+  <input name="_csrf_token" type="hidden" value="AHIqJmEUAxIvGy4HJ3oUGCMjChsLYBZ-SGgy7W1HElh3PKLsffgXXQO6">
+  <button type="submit">Remove</button>
+</form>
+```
+
+This form can be dispatched with
+
+```elixir
+conn
+|> get("/admin/posts")
+|> dispatch_form_with("post-123-delete-post")
+|> html_response(200) =~ "Post is deleted"
+```
+
+More documentation of how TestSelector works can be found in [TestSelectors wiki](
+https://github.com/defactosoftware/test_selector/wiki/Usage-in-App)
