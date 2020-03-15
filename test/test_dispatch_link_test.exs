@@ -55,5 +55,13 @@ defmodule TestDispatchLinkTest do
                      |> dispatch_link("some-none-existing-selector")
                    end
     end
+
+    test "test_selector should be a binary", %{conn: conn} do
+      assert_raise FunctionClauseError, fn ->
+        conn
+        |> get("/posts/1")
+        |> dispatch_link(%{})
+      end
+    end
   end
 end

@@ -97,7 +97,8 @@ defmodule TestDispatch do
 
   """
   @spec dispatch_form_with(Plug.Conn.t(), binary(), binary() | nil) :: Plug.Conn.t()
-  def dispatch_link(%Plug.Conn{} = conn, test_selector, test_value \\ nil) do
+  def dispatch_link(%Plug.Conn{} = conn, test_selector, test_value \\ nil)
+      when is_binary(test_selector) do
     link = find_link(conn, test_selector, test_value)
 
     endpoint = endpoint_module(conn)
