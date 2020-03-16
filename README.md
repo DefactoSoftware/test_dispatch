@@ -10,7 +10,7 @@ will submit to the intended controller action with the right params.
 
 ## Documentation
 
-Documentation can be found on [HexDocs](https://hexdocs.pm/test_dispatch_form)
+Documentation can be found on [HexDocs](https://hexdocs.pm/test_dispatch)
 
 ## Dependencies
 
