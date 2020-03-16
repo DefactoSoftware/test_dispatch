@@ -94,5 +94,71 @@ conn
 |> html_response(200) =~ "Post is deleted"
 ```
 
-More documentation of how TestSelector works can be found in [TestSelectors wiki](
+More documentation on how to use TestSelector can be found in [TestSelectors wiki](
 https://github.com/defactosoftware/test_selector/wiki/Usage-in-App)
+
+## Testing Links
+
+Links can also be dispatched and currently we can only do this by using
+TestSelector. For this `dispatch_link/3` can be used.
+
+For this example we can take a posts show page on `/posts/1`
+
+```html
+<div>
+  <h1>Post</h1>
+  <a href="/posts/1" data-method="delete" test-selector="post-123-delete-post">
+   Remove
+  </a>
+  <table>
+    <tr>
+      <td>This is perfect</td>
+      <td>
+        <a href="/posts/1/comments/1"
+           data-method="post"
+           test-value="1"
+           test-selector="post-123-upvote-comment" >
+          Upvote Comment
+      </td>
+    </tr>
+    <tr>
+      <td>A better comment</td>
+      <td>
+        <a href="/posts/1/comments/2"
+           data-method="post"
+           test-value="1"
+           test-selector="post-123-upvote-comment" >
+          Upvote Comment
+      </td>
+    </tr>
+  </table>
+</div>
+```
+
+We can now delete this post in the controller test by doing:
+
+```elixir
+conn
+|> get('/posts/1')
+|> dispatch_link("post-123-delete-post")
+|> html_response(200) =~ "Post was deleted"
+```
+
+The dispatch_link parses the page and tries to find `post-123-delete-post` it
+take the method by the `data-method` attribute. The url to dispatch to is taken
+from the `href`. In this case a `delete` request is done to `posts/1`.
+
+To take a specific element from a list test-values can be used as third argument
+of `dispatch_link/3`.
+
+```elixir
+conn
+|> get('/posts/1')
+|> dispatch_link("post-123-upvote-comment", "1")
+|> html_response(200) =~ "Upvoted comment 2"
+```
+
+As expected here a post request is done to `/posts/1/comments/2` for the second comment.
+
+If there is no `data-method` set dispatch_link/3 will do a `get` request by
+default.
