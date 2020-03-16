@@ -11,7 +11,7 @@ defmodule TestDispatch.ConnCase do
 
   using do
     quote do
-      Application.put_env(:test_dispatch_form, TestDispatchTest.Endpoint, [])
+      Application.put_env(:test_dispatch, TestDispatchTest.Endpoint, [])
 
       import Phoenix.ConnTest
       import TestDispatch

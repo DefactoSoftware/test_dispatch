@@ -36,7 +36,7 @@ defmodule TestDispatchLinkTest do
       assert html_response(dispatched_conn, 200) == @post_show_body
     end
 
-    test "raises an error when the selector with the vaule is not found", %{conn: conn} do
+    test "raises an error when the selector with the value is not found", %{conn: conn} do
       assert_raise RuntimeError,
                    "No `a` element found for selector \"some-none-existing-selector\" with value \"nonexistingvalue\"",
                    fn ->
@@ -46,7 +46,7 @@ defmodule TestDispatchLinkTest do
                    end
     end
 
-    test "raises an error when the selector  is not found", %{conn: conn} do
+    test "raises an error when the selector is not found", %{conn: conn} do
       assert_raise RuntimeError,
                    "No `a` element found for just the selector \"some-none-existing-selector\"",
                    fn ->

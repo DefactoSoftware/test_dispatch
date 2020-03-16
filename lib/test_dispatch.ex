@@ -50,11 +50,11 @@ defmodule TestDispatch do
   @doc """
   Finds a link by a given conn, test_selector and an optional test_value.
 
-  Hereby it tries to get an response from the and find the first <a></a> element that
-  has the combination of the test_selector and test_value. The link that is founnd will be
-  dispatched with  `Phoenix.ConnTest.dispatch/4`. The method will derived from the link
-  by the data-method attribute and has "get" as default.the path will be taken from the
-  href.
+  Hereby it tries to get a response from the conn and find the first `<a></a>` element that
+  has the combination of the test_selector and test_value. The link that is found will be
+  dispatched with  `Phoenix.ConnTest.dispatch/4`. The method will be derived from the link
+  by the `data-method` attribute and has "get" as default. The path will be taken from the
+  `href`.
 
   ## Examples
 
@@ -96,7 +96,7 @@ defmodule TestDispatch do
       :ok
 
   """
-  @spec dispatch_form_with(Plug.Conn.t(), binary(), binary() | nil) :: Plug.Conn.t()
+  @spec dispatch_link(Plug.Conn.t(), binary(), binary() | nil) :: Plug.Conn.t()
   def dispatch_link(%Plug.Conn{} = conn, test_selector, test_value \\ nil)
       when is_binary(test_selector) do
     link = find_link(conn, test_selector, test_value)
