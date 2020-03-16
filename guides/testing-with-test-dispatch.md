@@ -4,7 +4,7 @@ This library was built to test if forms and links have the expected results in
 controller tests when they would be dispatched.
 
 It can be used with or without the implementation of
-[TestSelector](https://github.com/DefactoSoftware/TestSelector).
+[TestSelector](https://github.com/defactosoftware/test_selector).
 
 ## Testing a form
 
