@@ -1,5 +1,5 @@
-defmodule TestDispatchFormTest do
-  use TestDispatchForm.ConnCase
+defmodule TestDispatch.FormTest do
+  use TestDispatch.ConnCase
 
   describe "form with entity and empty form controls" do
     test "dispatches form with attributes", %{conn: conn} do

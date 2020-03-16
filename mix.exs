@@ -1,18 +1,18 @@
-defmodule TestDispatchForm.MixProject do
+defmodule TestDispatch.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :test_dispatch_form,
+      app: :test_dispatch,
       deps: deps(),
       docs: docs(),
       description: "Helper to test the dispatch of Phoenix forms in Elixir applications",
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
-      name: "TestDispatchForm",
+      name: "TestDispatch",
       package: package(),
       preferred_cli_env: [coveralls: :test, "coveralls.detail": :test],
-      source_url: "https://github.com/DefactoSoftware/test_dispatch_form",
+      source_url: "https://github.com/DefactoSoftware/test_dispatch",
       start_permanent: Mix.env() == :test,
       test_coverage: [tool: ExCoveralls],
       dialyzer: [plt_add_apps: [:mix, :ex_unit], check_plt: true],
@@ -47,8 +47,8 @@ defmodule TestDispatchForm.MixProject do
       maintainers: ["Marcel Horlings", "Pien van Dalen"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/DefactoSoftware/test_dispatch_form",
-        "Docs" => "http://hexdocs.pm/test_dispatch_form/"
+        "GitHub" => "https://github.com/DefactoSoftware/test_dispatch",
+        "Docs" => "http://hexdocs.pm/test_dispatch/"
       }
     ]
   end

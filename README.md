@@ -1,4 +1,4 @@
-# TestDispatchForm
+# TestDispatch
 
 Helper to test the dispatch of Phoenix forms in Elixir applications. This will
 make it easier to write integration tests to check if forms in Phoenix templates
@@ -12,19 +12,19 @@ will submit to the intended controller action with the right params.
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `test_dispatch_form` to your list of dependencies in `mix.exs`:
+by adding `test_dispatch` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:test_dispatch_form, "~> 0.1.0"}
+    {:test_dispatch, "~> 0.1.0"}
   ]
 end
 ```
 
 ## Use
 
-Import TestDispatchForm in your test module or your test case and you can call
+Import TestDispatch in your test module or your test case and you can call
 `dispatch_form_with/3` from there.
 
 To use `dispatch_form_with/3` a request has to be made to a page where a form is
@@ -35,7 +35,7 @@ default values when they are not given.
 ```elixir
 defmodule MyAppWeb.MyTest do
   use MyAppWeb.ConnCase
-  import TestDispatchForm
+  import TestDispatch
 
   test "dispatches form with attributes and entity" do
     conn = build_conn()

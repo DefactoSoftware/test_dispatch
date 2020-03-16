@@ -1,6 +1,6 @@
-defmodule TestDispatchFormTest.Endpoint do
-  use Phoenix.Endpoint, otp_app: :test_dispatch_form
-  alias TestDispatchFormTest.Router
+defmodule TestDispatchTest.Endpoint do
+  use Phoenix.Endpoint, otp_app: :test_dispatch
+  alias TestDispatchTest.Router
 
   def init(opts), do: opts
 

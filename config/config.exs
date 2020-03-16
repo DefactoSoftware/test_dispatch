@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure your application as:
 #
-#     config :test_dispatch_form, key: :value
+#     config :test_dispatch, key: :value
 #
 # and access this configuration in your application as:
 #
-#     Application.get_env(:test_dispatch_form, :key)
+#     Application.get_env(:test_dispatch, :key)
 #
 # You can also configure a third-party app:
 #
