@@ -94,12 +94,12 @@ conn
 |> html_response(200) =~ "Post is deleted"
 ```
 
-More documentation of how TestSelector works can be found in [TestSelectors wiki](
+More documentation on how to use TestSelector can be found in [TestSelectors wiki](
 https://github.com/defactosoftware/test_selector/wiki/Usage-in-App)
 
 ## Testing Links
 
-Links can also be dispatched and at the current moment we can only do this with
+Links can also be dispatched and currently we can only do this by using
 TestSelector. For this `dispatch_link/3` can be used.
 
 For this example we can take a posts show page on `/posts/1`
