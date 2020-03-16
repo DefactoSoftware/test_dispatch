@@ -1,8 +1,16 @@
+[![Hex pm](http://img.shields.io/hexpm/v/test_dispatch.svg?style=flat)](https://hex.pm/packages/test_dispatch)
+[![codecov](https://codecov.io/gh/DefactoSoftware/test_dispatch/branch/master/graph/badge.svg)](https://codecov.io/gh/DefactoSoftware/test_dispatch)
+[![CircleCI](https://circleci.com/gh/DefactoSoftware/test_dispatch.svg?style=svg)](https://circleci.com/gh/DefactoSoftware/test_dispatch)
+
 # TestDispatch
 
 Helper to test the dispatch of Phoenix forms in Elixir applications. This will
 make it easier to write integration tests to check if forms in Phoenix templates
 will submit to the intended controller action with the right params.
+
+## Documentation
+
+Documentation can be found on [HexDocs](https://hexdocs.pm/test_dispatch_form)
 
 ## Dependencies
 
@@ -11,7 +19,7 @@ will submit to the intended controller action with the right params.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+The package can be installed
 by adding `test_dispatch` to your list of dependencies in `mix.exs`:
 
 ```elixir
