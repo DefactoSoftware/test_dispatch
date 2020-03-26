@@ -1,6 +1,6 @@
 defmodule TestDispatchLinkTest do
   use TestDispatch.ConnCase
-  doctest TestDispatch, import: true
+  doctest TestDispatch, import: true, only: [dispatch_link: 3]
 
   @post_show_body File.read!("test/support/links/_post_show.html")
 
