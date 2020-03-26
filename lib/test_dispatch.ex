@@ -5,7 +5,7 @@ defmodule TestDispatch do
   templates will submit to the intended controller action with the right params.
   """
 
-  import Phoenix.ConnTest, only: [dispatch: 4]
+  import Phoenix.ConnTest, only: [dispatch: 4, redirected_to: 2]
   import Phoenix.Controller, only: [endpoint_module: 1]
   import TestDispatch.Form
   import TestDispatch.Link
@@ -108,5 +108,27 @@ defmodule TestDispatch do
     path = floki_attribute(link, "href")
 
     dispatch(conn, endpoint, method, path)
+  end
+
+  @doc """
+  Will take a conn that was redirected. It takes the path that was redirected to and
+  performs a get on it. If the status does not match the redirected status it will
+  raise an error. By default the status is 302.
+
+  ## Examples
+
+      iex> conn = build_conn() |> get("/posts/1")
+      iex> conn = dispatch_link(conn, "post-123-delete-post")
+      iex> result = follow_redirect(conn, 302) |> html_response(200)
+      iex> if result =~ "Posts Index", do: :ok
+      :ok
+
+  """
+  @spec follow_redirect(Plug.Conn.t(), integer) :: Plug.Conn.t()
+  def follow_redirect(conn, status \\ 302) do
+    path = redirected_to(conn, status)
+    endpoint = endpoint_module(conn)
+
+    dispatch(conn, endpoint, "get", path)
   end
 end
