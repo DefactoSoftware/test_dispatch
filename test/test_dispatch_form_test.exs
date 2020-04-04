@@ -178,6 +178,7 @@ defmodule TestDispatch.FormTest do
         email: "john@doe.com",
         description: "Just a regular joe",
         roles: ["admin"],
+        color: "green",
         non_existing_field: "This will not show up in the params"
       }
 
@@ -193,7 +194,8 @@ defmodule TestDispatch.FormTest do
                "name" => "John Doe",
                "email" => "john@doe.com",
                "description" => "Just a regular joe",
-               "roles" => ["admin"]
+               "roles" => ["admin"],
+               "color" => "green"
              }
     end
 
@@ -210,7 +212,8 @@ defmodule TestDispatch.FormTest do
                "name" => nil,
                "email" => nil,
                "description" => "",
-               "roles" => nil
+               "roles" => nil,
+               "color" => "red"
              }
     end
   end
