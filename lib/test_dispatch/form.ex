@@ -26,8 +26,7 @@ defmodule TestDispatch.Form do
     checked_names = Floki.attribute(checked, "name")
 
     other_radios =
-      form
-      |> Floki.find("input[type=radio]")
+      radios
       |> Enum.uniq_by(fn {_, list, _} ->
         list |> Enum.find(fn {key, _} -> "name" == key end) |> elem(1)
       end)
