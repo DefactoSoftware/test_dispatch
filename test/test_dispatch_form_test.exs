@@ -8,7 +8,8 @@ defmodule TestDispatch.FormTest do
         email: "john@doe.com",
         description: "Just a regular joe",
         roles: ["admin", "moderator"],
-        non_existing_field: "This will not show up in the params"
+        non_existing_field: "This will not show up in the params",
+        color: "green"
       }
 
       %Plug.Conn{params: params} =
@@ -24,7 +25,8 @@ defmodule TestDispatch.FormTest do
                  "name" => "John Doe",
                  "email" => "john@doe.com",
                  "description" => "Just a regular joe",
-                 "roles" => ["admin", "moderator"]
+                 "roles" => ["admin", "moderator"],
+                 "color" => "green"
                }
              }
     end
@@ -49,7 +51,8 @@ defmodule TestDispatch.FormTest do
                  "name" => nil,
                  "email" => "john@doe.com",
                  "description" => "Just a regular joe",
-                 "roles" => ["admin", "moderator"]
+                 "roles" => ["admin", "moderator"],
+                 "color" => "red"
                }
              }
     end
@@ -68,7 +71,8 @@ defmodule TestDispatch.FormTest do
                  "name" => nil,
                  "email" => nil,
                  "description" => "",
-                 "roles" => nil
+                 "roles" => nil,
+                 "color" => "red"
                }
              }
     end

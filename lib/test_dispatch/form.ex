@@ -39,8 +39,14 @@ defmodule TestDispatch.Form do
 
   defp find_textareas(form, _), do: Floki.find(form, "textarea")
 
-  defp find_input_fields(form, {:entity, entity}),
-    do: Floki.find(form, "*[id^=#{entity}_]") |> Floki.filter_out("input[type=radio]")
+  defp find_input_fields(form, {:entity, entity}) do
+    inputs =
+      form
+      |> Floki.find("*[id^=#{entity}_]")
+      |> Floki.filter_out("input[type=radio]")
+
+    inputs ++ find_radio_buttons(form, "")
+  end
 
   defp find_input_fields(form, _),
     do:
@@ -71,12 +77,18 @@ defmodule TestDispatch.Form do
   defp _input_to_tuple("select", input),
     do: input |> Floki.find("option[selected=selected]") |> floki_attribute("value")
 
-  defp key_for_input(input, {:entity, entity}),
-    do:
-      input
-      |> floki_attribute("id")
-      |> String.replace_prefix("#{entity}_", "")
-      |> String.to_atom()
+  defp key_for_input(input, {:entity, entity}) do
+    id = input |> floki_attribute("id")
+
+    key =
+      if floki_attribute(input, "type") == "radio",
+        do: String.replace_suffix(id, "_#{floki_attribute(input, "value")}", ""),
+        else: id
+
+    key
+    |> String.replace_prefix("#{entity}_", "")
+    |> String.to_atom()
+  end
 
   defp key_for_input(input, _) do
     id = input |> floki_attribute("id")
