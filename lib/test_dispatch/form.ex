@@ -91,7 +91,7 @@ defmodule TestDispatch.Form do
   end
 
   defp key_for_input(input, _) do
-    id = input |> floki_attribute("id")
+    id = floki_attribute(input, "id")
 
     key =
       if floki_attribute(input, "type") == "radio",
