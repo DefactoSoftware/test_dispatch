@@ -13,19 +13,45 @@ defmodule TestDispatch.Form do
     fields = find_input_fields(form, "")
     selects = find_selects(form, "")
     textareas = find_textareas(form, "")
+    radio_buttons = find_radio_buttons(form, "")
 
-    Enum.uniq(fields ++ selects ++ textareas)
+    Enum.uniq(fields ++ selects ++ textareas ++ radio_buttons)
+  end
+
+  def find_radio_buttons(form, "") do
+    radios = Floki.find(form, "input[type=radio]")
+
+    checked = Enum.filter(radios, &floki_attribute(&1, "checked"))
+
+    checked_names = Floki.attribute(checked, "name")
+
+    other_radios =
+      radios
+      |> Enum.uniq_by(fn {_, list, _} ->
+        list |> Enum.find(fn {key, _} -> "name" == key end) |> elem(1)
+      end)
+      |> Enum.reject(fn radio -> floki_attribute(radio, "name") in checked_names end)
+
+    other_radios ++ checked
   end
 
   defp find_selects(form, _), do: Floki.find(form, "select")
 
   defp find_textareas(form, _), do: Floki.find(form, "textarea")
 
-  defp find_input_fields(form, {:entity, entity}), do: Floki.find(form, "*[id^=#{entity}_]")
+  defp find_input_fields(form, {:entity, entity}) do
+    inputs =
+      form
+      |> Floki.find("*[id^=#{entity}_]")
+      |> Floki.filter_out("input[type=radio]")
+
+    inputs ++ find_radio_buttons(form, "")
+  end
 
   defp find_input_fields(form, _),
     do:
       form
+      |> Floki.filter_out("input[type=radio]")
       |> Floki.filter_out("input[type=hidden]")
       |> Floki.find("input")
 
@@ -51,14 +77,29 @@ defmodule TestDispatch.Form do
   defp _input_to_tuple("select", input),
     do: input |> Floki.find("option[selected=selected]") |> floki_attribute("value")
 
-  defp key_for_input(input, {:entity, entity}),
-    do:
-      input
-      |> floki_attribute("id")
-      |> String.replace_prefix("#{entity}_", "")
-      |> String.to_atom()
+  defp key_for_input(input, {:entity, entity}) do
+    id = input |> floki_attribute("id")
 
-  defp key_for_input(input, _), do: input |> floki_attribute("id") |> String.to_atom()
+    key =
+      if floki_attribute(input, "type") == "radio",
+        do: String.replace_suffix(id, "_#{floki_attribute(input, "value")}", ""),
+        else: id
+
+    key
+    |> String.replace_prefix("#{entity}_", "")
+    |> String.to_atom()
+  end
+
+  defp key_for_input(input, _) do
+    id = floki_attribute(input, "id")
+
+    key =
+      if floki_attribute(input, "type") == "radio",
+        do: String.replace_suffix(id, "_#{floki_attribute(input, "value")}", ""),
+        else: id
+
+    String.to_atom(key)
+  end
 
   def send_to_action(params, form, conn) do
     endpoint = endpoint_module(conn)
