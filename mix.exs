@@ -38,6 +38,7 @@ defmodule TestDispatch.MixProject do
       {:excoveralls, "~> 0.7", only: :test},
       {:floki, "~> 0.26.0"},
       {:phoenix, "~> 1.4"},
+      {:plug, "~> 1.5", override: true},
       {:test_selector, "~> 0.3.0"}
     ]
   end
