@@ -37,7 +37,7 @@ defmodule TestDispatch.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.7", only: :test},
       {:floki, "~> 0.26.0"},
-      {:phoenix, "~> 1.4"},
+      {:phoenix, "~> 1.4", override: true},
       {:test_selector, "~> 0.3.0"}
     ]
   end
