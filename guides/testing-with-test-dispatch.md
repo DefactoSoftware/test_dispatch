@@ -48,7 +48,7 @@ A request is made to the router here with the method `POST` to the action
 `/admin/users/create` and with the params `%{"user" => %{"name" => "",
 "email" => "", "description" => "", "roles" => ""}}`
 
-The `dispatch_form_with/3` will return a conn with the response of the
+The `dispatch_form/3` will return a conn with the response of the
 controller. In this case it has returned an error because all fields are left
 blank.
 
@@ -90,7 +90,7 @@ This form can be dispatched with
 ```elixir
 conn
 |> get("/admin/posts")
-|> dispatch_form_with("post-123-delete-post")
+|> dispatch_form("post-123-delete-post")
 |> html_response(200) =~ "Post is deleted"
 ```
 

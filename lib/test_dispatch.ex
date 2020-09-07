@@ -16,7 +16,7 @@ defmodule TestDispatch do
   the last form found in the response.
 
   Next it will look for form controls (inputs, selects), convert these to params
-  and use the attributes passed to `dispatch_form_with/3` to update the values
+  and use the attributes passed to `dispatch_form/3` to update the values
   of the params. The params will now only contain field keys found in the
   controls of the form.
 
@@ -26,10 +26,10 @@ defmodule TestDispatch do
   using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
   action found in the form.
   """
-  @spec dispatch_form_with(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
-  def dispatch_form_with(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
+  @spec dispatch_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
+  def dispatch_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
 
-  def dispatch_form_with(%Plug.Conn{} = conn, %{} = attrs, entity_or_test_selector)
+  def dispatch_form(%Plug.Conn{} = conn, %{} = attrs, entity_or_test_selector)
       when is_binary(entity_or_test_selector) or
              is_nil(entity_or_test_selector) or
              is_atom(entity_or_test_selector) do
@@ -44,8 +44,8 @@ defmodule TestDispatch do
     |> send_to_action(form, conn)
   end
 
-  def dispatch_form_with(conn, entity_or_test_selector, nil),
-    do: dispatch_form_with(conn, %{}, entity_or_test_selector)
+  def dispatch_form(conn, entity_or_test_selector, nil),
+    do: dispatch_form(conn, %{}, entity_or_test_selector)
 
   @doc """
   Finds a link by a given conn, test_selector and an optional test_value.

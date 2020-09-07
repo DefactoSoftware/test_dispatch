@@ -16,7 +16,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/new", %{form: "entity_and_form_controls"})
-        |> dispatch_form_with(attrs, :user)
+        |> dispatch_form(attrs, :user)
 
       assert html_response(dispatched_conn, 200) == "user created"
 
@@ -42,7 +42,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/new", %{form: "entity_and_form_controls"})
-        |> dispatch_form_with(attrs, :user)
+        |> dispatch_form(attrs, :user)
 
       assert html_response(dispatched_conn, 200) == "not all required params are set"
 
@@ -62,7 +62,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/new", %{form: "entity_and_form_controls"})
-        |> dispatch_form_with(:user)
+        |> dispatch_form(:user)
 
       assert html_response(dispatched_conn, 200) == "not all required params are set"
 
@@ -89,7 +89,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/new", %{form: "lacking_required_form_controls"})
-        |> dispatch_form_with(attrs, :user)
+        |> dispatch_form(attrs, :user)
 
       assert html_response(dispatched_conn, 200) == "not all required params are set"
 
@@ -116,7 +116,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/new", %{form: "test_selector_and_form_controls"})
-        |> dispatch_form_with(attrs, "new-user")
+        |> dispatch_form(attrs, "new-user")
 
       assert html_response(dispatched_conn, 200) == "user created"
 
@@ -133,7 +133,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/new", %{form: "test_selector_and_form_controls"})
-        |> dispatch_form_with("new-user")
+        |> dispatch_form("new-user")
 
       assert html_response(dispatched_conn, 200) == "not all required params are set"
 
@@ -152,7 +152,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/index")
-        |> dispatch_form_with("export-users")
+        |> dispatch_form("export-users")
 
       assert html_response(dispatched_conn, 200) == "users exported"
       assert params == %{}
@@ -168,7 +168,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/index")
-        |> dispatch_form_with(attrs, "export-users")
+        |> dispatch_form(attrs, "export-users")
 
       assert html_response(dispatched_conn, 200) == "users exported"
       assert params == %{}
@@ -190,7 +190,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/new", %{form: "only_form_controls"})
-        |> dispatch_form_with(attrs)
+        |> dispatch_form(attrs)
 
       assert html_response(dispatched_conn, 200) == "user created"
 
@@ -208,7 +208,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/new", %{form: "only_form_controls"})
-        |> dispatch_form_with(%{})
+        |> dispatch_form(%{})
 
       assert html_response(dispatched_conn, 200) == "not all required params are set"
 
@@ -228,7 +228,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/index")
-        |> dispatch_form_with()
+        |> dispatch_form()
 
       assert html_response(dispatched_conn, 200) == "users exported"
       assert params == %{}
@@ -245,7 +245,7 @@ defmodule TestDispatch.FormTest do
         dispatched_conn =
         conn
         |> get("/users/index")
-        |> dispatch_form_with(attrs)
+        |> dispatch_form(attrs)
 
       assert html_response(dispatched_conn, 200) == "users exported"
       assert params == %{}
@@ -259,7 +259,7 @@ defmodule TestDispatch.FormTest do
       RuntimeError,
       "No form found for the given test_selector or entity: new-user",
       fn ->
-        dispatch_form_with(conn, "new-user")
+        dispatch_form(conn, "new-user")
       end
     )
   end
@@ -268,7 +268,7 @@ defmodule TestDispatch.FormTest do
     conn = get(conn, "/users/new", %{form: "only_form_controls"})
 
     assert_raise(RuntimeError, "No form found for the given test_selector or entity: user", fn ->
-      dispatch_form_with(conn, :user)
+      dispatch_form(conn, :user)
     end)
   end
 
@@ -279,7 +279,7 @@ defmodule TestDispatch.FormTest do
       |> Plug.Conn.resp(200, "no form here")
 
     assert_raise(RuntimeError, "No form found for the given test_selector or entity: user", fn ->
-      dispatch_form_with(conn, :user)
+      dispatch_form(conn, :user)
     end)
   end
 end
