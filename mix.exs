@@ -36,7 +36,7 @@ defmodule TestDispatch.MixProject do
       {:dialyxir, "~> 0.5", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.7", only: :test},
-      {:floki, "~> 0.28.0"},
+      {:floki, "~> 0.29.0"},
       {:phoenix, "~> 1.4"},
       {:plug, "~> 1.5", override: true},
       {:test_selector, "~> 0.3.0"}
