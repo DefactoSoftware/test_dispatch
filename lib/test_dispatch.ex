@@ -47,6 +47,10 @@ defmodule TestDispatch do
   def dispatch_form(conn, entity_or_test_selector, nil),
     do: dispatch_form(conn, %{}, entity_or_test_selector)
 
+  @doc """
+  Works like `dispatch/3`. The test_selector is used to find the right form and the
+  entity is used to find and fill the inputs correctly.
+  """
   @spec dispatch_form(Plug.Conn.t(), %{}, atom(), binary()) :: Plug.Conn.t()
 
   def dispatch_form(%Plug.Conn{} = conn, %{} = attrs, entity, test_selector) do
