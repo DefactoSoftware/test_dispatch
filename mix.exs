@@ -16,7 +16,7 @@ defmodule TestDispatch.MixProject do
       start_permanent: Mix.env() == :test,
       test_coverage: [tool: ExCoveralls],
       dialyzer: [plt_add_apps: [:mix, :ex_unit], check_plt: true],
-      version: "0.2.2"
+      version: "0.2.3"
     ]
   end
 
