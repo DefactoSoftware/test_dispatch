@@ -96,11 +96,28 @@ defmodule TestDispatch do
       :ok
 
   """
-  @spec dispatch_link(Plug.Conn.t(), binary(), binary() | nil) :: Plug.Conn.t()
-  def dispatch_link(%Plug.Conn{} = conn, test_selector, test_value \\ nil)
-      when is_binary(test_selector) do
-    link = find_link(conn, test_selector, test_value)
+  @spec dispatch_link(nil | Floki.html_tree(), Plug.Conn.t(), binary(), binary() | nil) ::
+          Plug.Conn.t()
+  def dispatch_link(floki_tree \\ nil, conn, test_selector, test_value \\ nil)
 
+  def dispatch_link(nil, %Plug.Conn{} = conn, test_selector, test_value),
+    do: dispatch_link(conn, test_selector, test_value, nil)
+
+  def dispatch_link(floki_tree, %Plug.Conn{} = conn, test_selector, test_value)
+      when is_list(floki_tree) and is_binary(test_selector),
+      do:
+        floki_tree
+        |> find_link(test_selector, test_value)
+        |> _dispatch_link(conn)
+
+  def dispatch_link(%Plug.Conn{} = conn, test_selector, test_value, _tree)
+      when is_binary(test_selector),
+      do:
+        conn
+        |> find_link(test_selector, test_value)
+        |> _dispatch_link(conn)
+
+  def _dispatch_link(link, conn) do
     endpoint = endpoint_module(conn)
 
     method = floki_attribute(link, "data-method") || "get"
