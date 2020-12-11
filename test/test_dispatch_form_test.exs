@@ -282,4 +282,35 @@ defmodule TestDispatch.FormTest do
       dispatch_form(conn, :user)
     end)
   end
+
+  describe "form with entity AND test_selector" do
+    test "use both the entity and selector to dispatch the right form", %{conn: conn} do
+      attrs = %{
+        name: "John Doe",
+        email: "john@doe.com",
+        description: "Just a regular joe",
+        roles: ["admin", "moderator"],
+        non_existing_field: "This will not show up in the params",
+        color: "green"
+      }
+
+      %Plug.Conn{params: params} =
+        dispatched_conn =
+        conn
+        |> get("/users/new", %{form: "multiple_selector_and_form_controls"})
+        |> dispatch_form(attrs, :user, "user-profile")
+
+      assert html_response(dispatched_conn, 200) == "not all required params are set"
+
+      assert params == %{
+               "id" => "1",
+               "user" => %{
+                 "description" => "Just a regular joe",
+                 "email" => "john@doe.com",
+                 "name" => "John Doe",
+                 "roles" => ["admin", "moderator"]
+               }
+             }
+    end
+  end
 end

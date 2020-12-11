@@ -48,6 +48,24 @@ defmodule TestDispatch do
     do: dispatch_form(conn, %{}, entity_or_test_selector)
 
   @doc """
+  Works like `dispatch/3`. The test_selector is used to find the right form and the
+  entity is used to find and fill the inputs correctly.
+  """
+  @spec dispatch_form(Plug.Conn.t(), %{}, atom(), binary()) :: Plug.Conn.t()
+
+  def dispatch_form(%Plug.Conn{} = conn, %{} = attrs, entity, test_selector) do
+    {form, _} = find_form(conn, test_selector)
+    selector_tuple = {:entity, entity}
+
+    form
+    |> find_inputs(selector_tuple)
+    |> Enum.map(&input_to_tuple(&1, selector_tuple))
+    |> update_input_values(attrs)
+    |> prepend_entity(selector_tuple)
+    |> send_to_action(form, conn)
+  end
+
+  @doc """
   Finds a link by a given conn, test_selector and an optional test_value.
 
   Hereby it tries to get a response from the conn and find the first `<a></a>` element that

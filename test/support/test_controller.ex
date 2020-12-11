@@ -28,6 +28,12 @@ defmodule TestDispatchTest.Controller do
       else: set_html_resp(conn, 200, "not all required params are set")
   end
 
+  def call(%{params: params} = conn, :update) do
+    if has_all_required_params?(params),
+      do: set_html_resp(conn, 200, "user updated"),
+      else: set_html_resp(conn, 200, "not all required params are set")
+  end
+
   def call(conn, :export) do
     set_html_resp(conn, 200, "users exported")
   end

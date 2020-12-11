@@ -12,6 +12,7 @@ defmodule TestDispatchTest.Router do
     get("/users/index", Controller, :index)
     get("/users/new", Controller, :new)
     post("/users/create", Controller, :create)
+    put("/users/:id", Controller, :update)
     post("/users/export", Controller, :export)
 
     get("/posts", PostController, :index)
