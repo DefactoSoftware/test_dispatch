@@ -6,33 +6,26 @@ defmodule TestDispatchLinkTest do
 
   describe "dispatch_link" do
     test "dispatches a delete by only a test selector", %{conn: conn} do
-      %Plug.Conn{} =
-        dispatched_conn =
-        conn
-        |> get("/posts/1")
-        |> dispatch_link("post-123-delete-post")
-
-      assert redirected_to(dispatched_conn, 302) == "/posts"
+      assert conn
+             |> get("/posts/1")
+             |> dispatch_link("post-123-delete-post")
+             |> redirected_to(302) == "/posts"
     end
 
     test "dispatches a post by test selector and test value", %{conn: conn} do
-      %Plug.Conn{} =
-        dispatched_conn =
-        conn
-        |> get("/posts/1")
-        |> dispatch_link("post-123-upvote-comment", "1")
-
-      assert redirected_to(dispatched_conn, 302) == "/posts/1"
+      assert conn
+             |> get("/posts/1")
+             |> dispatch_link("post-123-upvote-comment", "1")
+             |> redirected_to(302) == "/posts/1"
     end
 
     test "dispatches a get as fallback", %{conn: conn} do
-      %Plug.Conn{request_path: request_path} =
-        dispatched_conn =
+      dispatched_conn =
         conn
         |> get("/posts")
         |> dispatch_link("post-index-1234-post-link", "1")
 
-      assert request_path == "/posts/1"
+      assert dispatched_conn.request_path == "/posts/1"
       assert html_response(dispatched_conn, 200) == @post_show_body
     end
 
@@ -54,6 +47,20 @@ defmodule TestDispatchLinkTest do
                      |> get("/posts/1")
                      |> dispatch_link("some-none-existing-selector")
                    end
+    end
+
+    test "works with given floki tree", %{conn: conn} do
+      conn = conn |> get("/posts")
+
+      dispatched_conn =
+        conn
+        |> html_response(200)
+        |> Floki.parse_fragment!()
+        |> Floki.find("[test-selector=post-index-1234-post-item]")
+        |> dispatch_link(conn, "post-index-1234-post-link", "1")
+
+      assert dispatched_conn.request_path == "/posts/1"
+      assert html_response(dispatched_conn, 200) == @post_show_body
     end
 
     test "test_selector should be a binary", %{conn: conn} do
