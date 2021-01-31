@@ -58,17 +58,31 @@ defmodule TestDispatch.Form do
   def prepend_entity(attrs, {:entity, entity}), do: %{entity => attrs}
   def prepend_entity(attrs, _), do: attrs
 
-  def update_input_values(list, attrs),
-    do:
-      Enum.reduce(list, %{}, fn {key, value}, acc ->
-        Map.put(acc, key, Map.get(attrs, key, value))
-      end)
+  def update_input_values(list, attrs \\ %{}) do
+    Enum.reduce(list, %{}, fn item, acc ->
+      case item do
+        {key, value} ->
+          Map.put(acc, key, Map.get(attrs, key, value))
+
+        {key, index, {nested_key, value}} = tuple ->
+          nested_attr =
+            attrs |> Map.get(key, []) |> Enum.at(index, %{}) |> Map.get(nested_key, value)
+
+          acc_nested_list = Map.get(acc, key, false)
+          new_nested_list = update_nested_input_values(acc_nested_list, tuple, nested_attr)
+
+          Map.put(acc, key, new_nested_list)
+      end
+    end)
+  end
 
   def input_to_tuple(input, entity_tuple) do
-    key = key_for_input(input, entity_tuple)
     value = input |> elem(0) |> _input_to_tuple([input])
 
-    {key, value}
+    case input |> key_for_input(entity_tuple) |> resolve_nested() do
+      {key, index, nested_key} -> {key, index, {nested_key, value}}
+      key -> {key, value}
+    end
   end
 
   defp _input_to_tuple("textarea", input), do: Floki.text(input)
@@ -85,21 +99,42 @@ defmodule TestDispatch.Form do
         do: String.replace_suffix(id, "_#{floki_attribute(input, "value")}", ""),
         else: id
 
-    key
-    |> String.replace_prefix("#{entity}_", "")
-    |> String.to_atom()
+    String.replace_prefix(key, "#{entity}_", "")
   end
 
   defp key_for_input(input, _) do
     id = floki_attribute(input, "id")
 
-    key =
-      if floki_attribute(input, "type") == "radio",
-        do: String.replace_suffix(id, "_#{floki_attribute(input, "value")}", ""),
-        else: id
-
-    String.to_atom(key)
+    if floki_attribute(input, "type") == "radio",
+      do: String.replace_suffix(id, "_#{floki_attribute(input, "value")}", ""),
+      else: id
   end
+
+  defp resolve_nested(key) do
+    case Regex.split(~r{_\d*_}, key, include_captures: true) do
+      [key, capture, nested_key] ->
+        index =
+          capture
+          |> String.replace_prefix("_", "")
+          |> String.replace_suffix("_", "")
+          |> String.to_integer()
+
+        {String.to_atom(key), index, String.to_atom(nested_key)}
+
+      _ ->
+        String.to_atom(key)
+    end
+  end
+
+  defp update_nested_input_values(false, {_, _, {nested_key, _}}, nested_attr),
+    do: [Map.put(%{}, nested_key, nested_attr)]
+
+  defp update_nested_input_values(acc_nested_list, {_, index, {nested_key, _}}, nested_attr)
+       when length(acc_nested_list) > index,
+       do: List.update_at(acc_nested_list, index, &Map.put(&1, nested_key, nested_attr))
+
+  defp update_nested_input_values(acc_nested_list, {_, index, {nested_key, _}}, nested_attr),
+    do: List.insert_at(acc_nested_list, index, Map.put(%{}, nested_key, nested_attr))
 
   def send_to_action(params, form, conn) do
     endpoint = endpoint_module(conn)
