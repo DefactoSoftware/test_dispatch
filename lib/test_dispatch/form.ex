@@ -115,8 +115,7 @@ defmodule TestDispatch.Form do
       [key, capture, nested_key] ->
         index =
           capture
-          |> String.replace_prefix("_", "")
-          |> String.replace_suffix("_", "")
+          |> String.replace("_", "")
           |> String.to_integer()
 
         {String.to_atom(key), index, String.to_atom(nested_key)}
