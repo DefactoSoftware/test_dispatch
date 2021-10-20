@@ -42,15 +42,6 @@ defmodule TestDispatch do
   def dispatch_form(conn, entity_or_test_selector, nil),
     do: dispatch_form(conn, %{}, entity_or_test_selector)
 
-  defp _dispatch_form(conn, form, selector_tuple, attrs) do
-    form
-    |> find_inputs(selector_tuple)
-    |> Enum.map(&input_to_tuple(&1, selector_tuple))
-    |> update_input_values(attrs)
-    |> prepend_entity(selector_tuple)
-    |> send_to_action(form, conn)
-  end
-
   @doc """
   Works like `dispatch/3`. The test_selector is used to find the right form and the
   entity is used to find and fill the inputs correctly.
@@ -67,6 +58,15 @@ defmodule TestDispatch do
   @spec submit_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
   def submit_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil),
     do: dispatch_form(conn, attrs, entity_or_test_selector)
+
+  defp _dispatch_form(conn, form, selector_tuple, attrs) do
+    form
+    |> find_inputs(selector_tuple)
+    |> Enum.map(&input_to_tuple(&1, selector_tuple))
+    |> update_input_values(attrs)
+    |> prepend_entity(selector_tuple)
+    |> send_to_action(form, conn)
+  end
 
   @doc """
   Works like `submit_form/3`. The test_selector is used to find the right form and the
