@@ -36,6 +36,13 @@ defmodule TestDispatch do
     {form, selector_type} = find_form(conn, entity_or_test_selector)
     selector_tuple = {selector_type, entity_or_test_selector}
 
+    _dispatch_form(conn, form, selector_tuple, attrs)
+  end
+
+  def dispatch_form(conn, entity_or_test_selector, nil),
+    do: dispatch_form(conn, %{}, entity_or_test_selector)
+
+  defp _dispatch_form(conn, form, selector_tuple, attrs) do
     form
     |> find_inputs(selector_tuple)
     |> Enum.map(&input_to_tuple(&1, selector_tuple))
@@ -43,9 +50,6 @@ defmodule TestDispatch do
     |> prepend_entity(selector_tuple)
     |> send_to_action(form, conn)
   end
-
-  def dispatch_form(conn, entity_or_test_selector, nil),
-    do: dispatch_form(conn, %{}, entity_or_test_selector)
 
   @doc """
   Works like `dispatch/3`. The test_selector is used to find the right form and the
@@ -57,16 +61,11 @@ defmodule TestDispatch do
     {form, _} = find_form(conn, test_selector)
     selector_tuple = {:entity, entity}
 
-    form
-    |> find_inputs(selector_tuple)
-    |> Enum.map(&input_to_tuple(&1, selector_tuple))
-    |> update_input_values(attrs)
-    |> prepend_entity(selector_tuple)
-    |> send_to_action(form, conn)
+    _dispatch_form(conn, form, selector_tuple, attrs)
   end
 
   @spec submit_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
-  def submit_form(conn, attrs, entity_or_test_selector),
+  def submit_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil),
     do: dispatch_form(conn, attrs, entity_or_test_selector)
 
   @doc """
@@ -77,6 +76,14 @@ defmodule TestDispatch do
 
   def submit_form(conn, attrs, entity, test_selector),
     do: dispatch_form(conn, attrs, entity, test_selector)
+
+  @spec submit_form(Plug.Conn.t(), %{}, binary()) :: Plug.Conn.t()
+  def submit_with_button(%Plug.Conn{} = conn, attrs \\ %{}, button_text) do
+    {form, _} = find_form(conn, button_text: button_text)
+    selector_tuple = {:button_text, button_text}
+
+    _dispatch_form(conn, form, selector_tuple, attrs)
+  end
 
   @doc """
   Finds a link by a given conn, test_selector and an optional test_value.
@@ -148,8 +155,6 @@ defmodule TestDispatch do
         |> find_link(test_selector, test_value)
         |> _dispatch_link(conn)
 
-  @spec dispatch_link(nil | Floki.html_tree(), Plug.Conn.t(), binary(), binary() | nil) ::
-          Plug.Conn.t()
   def click_link(conn, test_selector, test_value, tree),
     do: dispatch_link(conn, test_selector, test_value, tree)
 
