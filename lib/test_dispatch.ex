@@ -172,7 +172,7 @@ defmodule TestDispatch do
   """
 
   def click_link(tree \\ nil, conn, test_selector, test_value \\ nil),
-    do: dispatch_link(conn, test_selector, test_value, tree)
+    do: dispatch_link(tree, conn, test_selector, test_value)
 
   def _dispatch_link(link, conn) do
     endpoint = endpoint_module(conn)
@@ -192,7 +192,7 @@ defmodule TestDispatch do
   ## Examples
 
       iex> conn = build_conn() |> get("/posts/1")
-      iex> conn = dispatch_link(conn, "post-123-delete-post")
+      iex> conn = click_link(conn, "post-123-delete-post")
       iex> result = follow_redirect(conn, 302) |> html_response(200)
       iex> if result =~ "Posts Index", do: :ok
       :ok
