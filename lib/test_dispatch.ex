@@ -65,6 +65,19 @@ defmodule TestDispatch do
     |> send_to_action(form, conn)
   end
 
+  @spec submit_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
+  def submit_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil),
+    do: dispatch_form(conn, attrs, entity_or_test_selector)
+
+  @doc """
+  Works like `submit_form/3`. The test_selector is used to find the right form and the
+  entity is used to find and fill the inputs correctly.
+  """
+  @spec submit_form(Plug.Conn.t(), %{}, atom(), binary()) :: Plug.Conn.t()
+
+  def submit_form(conn, attrs, entity, test_selector),
+    do: dispatch_form(conn, attrs, entity, test_selector)
+
   @doc """
   Finds a link by a given conn, test_selector and an optional test_value.
 
@@ -134,6 +147,11 @@ defmodule TestDispatch do
         conn
         |> find_link(test_selector, test_value)
         |> _dispatch_link(conn)
+
+  @spec dispatch_link(nil | Floki.html_tree(), Plug.Conn.t(), binary(), binary() | nil) ::
+          Plug.Conn.t()
+  def click_link(conn, test_selector, test_value, tree),
+    do: dispatch_link(conn, test_selector, test_value, tree)
 
   def _dispatch_link(link, conn) do
     endpoint = endpoint_module(conn)
