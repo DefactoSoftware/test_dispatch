@@ -11,20 +11,7 @@ defmodule TestDispatch do
   import TestDispatch.Link
 
   @doc """
-  Will find a form in the HTML response of the given conn by entity or by
-  `TestSelector`, or, if no entity or test_selector is provided, it will target
-  the last form found in the response.
-
-  Next it will look for form controls (inputs, selects), convert these to params
-  and use the attributes passed to `dispatch_form/3` to update the values
-  of the params. The params will now only contain field keys found in the
-  controls of the form.
-
-  If an entity is given, the params will be prepended by this entity.
-
-  Ultimately, the conn is dispatched to the conn's `private.phoenix_endpoint`
-  using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
-  action found in the form.
+  See `submit_form/3` for documentation.
   """
   @spec dispatch_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
   def dispatch_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
@@ -43,8 +30,7 @@ defmodule TestDispatch do
     do: dispatch_form(conn, %{}, entity_or_test_selector)
 
   @doc """
-  Works like `dispatch/3`. The test_selector is used to find the right form and the
-  entity is used to find and fill the inputs correctly.
+  See `submit_form/3` for documentation.
   """
   @spec dispatch_form(Plug.Conn.t(), %{}, atom(), binary()) :: Plug.Conn.t()
 
@@ -54,6 +40,23 @@ defmodule TestDispatch do
 
     _dispatch_form(conn, form, selector_tuple, attrs)
   end
+
+  @doc """
+  Will find a form in the HTML response of the given conn by entity or by
+  `TestSelector`, or, if no entity or test_selector is provided, it will target
+  the last form found in the response.
+
+  Next it will look for form controls (inputs, selects), convert these to params
+  and use the attributes passed to `submit_form/3` to update the values
+  of the params. The params will now only contain field keys found in the
+  controls of the form.
+
+  If an entity is given, the params will be prepended by this entity.
+
+  Ultimately, the conn is dispatched to the conn's `private.phoenix_endpoint`
+  using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
+  action found in the form.
+  """
 
   @spec submit_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
   def submit_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil),
@@ -77,6 +80,15 @@ defmodule TestDispatch do
   def submit_form(conn, attrs, entity, test_selector),
     do: dispatch_form(conn, attrs, entity, test_selector)
 
+  @doc """
+  Works like `submit_form/3` but instead of an entity or test_selector it uses
+  the text of the button to match on the third argument.
+
+  ## Examples
+
+      iex> submit_with_button(conn, %{answer_option: "elixir"}, "Finish Quiz")
+      %Plug.Conn{params: %{"answer_option" => "elixir"})
+  """
   @spec submit_with_button(Plug.Conn.t(), %{}, binary()) :: Plug.Conn.t()
   def submit_with_button(%Plug.Conn{} = conn, attrs \\ %{}, button_text) do
     {form, _} = find_form(conn, button_text: button_text)
@@ -86,11 +98,35 @@ defmodule TestDispatch do
   end
 
   @doc """
+  See `click_link/4` for documentation.
+  """
+  @spec dispatch_link(nil | Floki.html_tree(), Plug.Conn.t(), binary(), binary() | nil) ::
+          Plug.Conn.t()
+  def dispatch_link(floki_tree \\ nil, conn, test_selector, test_value \\ nil)
+
+  def dispatch_link(nil, %Plug.Conn{} = conn, test_selector, test_value),
+    do: dispatch_link(conn, test_selector, test_value, nil)
+
+  def dispatch_link(floki_tree, %Plug.Conn{} = conn, test_selector, test_value)
+      when is_list(floki_tree) and is_binary(test_selector),
+      do:
+        floki_tree
+        |> find_link(test_selector, test_value)
+        |> _dispatch_link(conn)
+
+  def dispatch_link(%Plug.Conn{} = conn, test_selector, test_value, _tree)
+      when is_binary(test_selector),
+      do:
+        conn
+        |> find_link(test_selector, test_value)
+        |> _dispatch_link(conn)
+
+  @doc """
   Finds a link by a given conn, test_selector and an optional test_value.
 
   Hereby it tries to get a response from the conn and find the first `<a></a>` element that
   has the combination of the test_selector and test_value. The link that is found will be
-  dispatched with  `Phoenix.ConnTest.dispatch/4`. The method will be derived from the link
+  dispatched with `Phoenix.ConnTest.dispatch/4`. The method will be derived from the link
   by the `data-method` attribute and has "get" as default. The path will be taken from the
   `href`.
 
@@ -124,38 +160,18 @@ defmodule TestDispatch do
   ```
 
       iex> conn = build_conn() |> get("/posts/1")
-      iex> result = dispatch_link(conn, "post-123-delete-post")
+      iex> result = click_link(conn, "post-123-delete-post")
       iex> with %Plug.Conn{request_path: "/posts/1", method: "DELETE"} <- result, do: :ok
       :ok
 
       iex> conn = build_conn() |> get("/posts/1")
-      iex> result = dispatch_link(conn, "post-123-upvote-comment", "1")
+      iex> result = click_link(conn, "post-123-upvote-comment", "1")
       iex> with %Plug.Conn{request_path: "/posts/1/comments/1", method: "POST"} <- result, do: :ok
       :ok
 
   """
-  @spec dispatch_link(nil | Floki.html_tree(), Plug.Conn.t(), binary(), binary() | nil) ::
-          Plug.Conn.t()
-  def dispatch_link(floki_tree \\ nil, conn, test_selector, test_value \\ nil)
 
-  def dispatch_link(nil, %Plug.Conn{} = conn, test_selector, test_value),
-    do: dispatch_link(conn, test_selector, test_value, nil)
-
-  def dispatch_link(floki_tree, %Plug.Conn{} = conn, test_selector, test_value)
-      when is_list(floki_tree) and is_binary(test_selector),
-      do:
-        floki_tree
-        |> find_link(test_selector, test_value)
-        |> _dispatch_link(conn)
-
-  def dispatch_link(%Plug.Conn{} = conn, test_selector, test_value, _tree)
-      when is_binary(test_selector),
-      do:
-        conn
-        |> find_link(test_selector, test_value)
-        |> _dispatch_link(conn)
-
-  def click_link(conn, test_selector, test_value, tree),
+  def click_link(tree \\ nil, conn, test_selector, test_value \\ nil),
     do: dispatch_link(conn, test_selector, test_value, tree)
 
   def _dispatch_link(link, conn) do

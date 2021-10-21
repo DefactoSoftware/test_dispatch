@@ -1,7 +1,7 @@
 # Testing with TestDispatch
 
 This library was built to test if forms and links have the expected results in
-controller tests when they would be dispatched.
+controller tests when they would be submitted or clicked on.
 
 It can be used with or without the implementation of
 [TestSelector](https://github.com/defactosoftware/test_selector).
@@ -48,7 +48,7 @@ A request is made to the router here with the method `POST` to the action
 `/admin/users/create` and with the params `%{"user" => %{"name" => "",
 "email" => "", "description" => "", "roles" => ""}}`
 
-The `dispatch_form/3` will return a conn with the response of the
+The `submit_form/3` will return a conn with the response of the
 controller. In this case it has returned an error because all fields are left
 blank.
 
@@ -75,7 +75,7 @@ posted.
 ### TestSelector
 
 Some forms can be created that only have a submit button and cannot be found
-with an entity. In this we can use `TestSelector` to find the form and dispatch
+with an entity. In this we can use `TestSelector` to find the form and submit
 it.
 
 ```html
@@ -85,12 +85,12 @@ it.
 </form>
 ```
 
-This form can be dispatched with
+This form can be submitted with
 
 ```elixir
 conn
 |> get("/admin/posts")
-|> dispatch_form("post-123-delete-post")
+|> submit_form("post-123-delete-post")
 |> html_response(200) =~ "Post is deleted"
 ```
 
@@ -99,8 +99,8 @@ https://github.com/defactosoftware/test_selector/wiki/Usage-in-App)
 
 ## Testing Links
 
-Links can also be dispatched and currently we can only do this by using
-TestSelector. For this `dispatch_link/3` can be used.
+Links can also be submitted and currently we can only do this by using
+TestSelector. For this `click_link/3` can be used.
 
 For this example we can take a posts show page on `/posts/1`
 
@@ -140,25 +140,25 @@ We can now delete this post in the controller test by doing:
 ```elixir
 conn
 |> get('/posts/1')
-|> dispatch_link("post-123-delete-post")
+|> click_link("post-123-delete-post")
 |> html_response(200) =~ "Post was deleted"
 ```
 
-The dispatch_link parses the page and tries to find `post-123-delete-post` it
-take the method by the `data-method` attribute. The url to dispatch to is taken
+The click_link parses the page and tries to find `post-123-delete-post` it
+take the method by the `data-method` attribute. The url to click on is taken
 from the `href`. In this case a `delete` request is done to `posts/1`.
 
 To take a specific element from a list test-values can be used as third argument
-of `dispatch_link/3`.
+of `click_link/3`.
 
 ```elixir
 conn
 |> get('/posts/1')
-|> dispatch_link("post-123-upvote-comment", "1")
+|> click_link("post-123-upvote-comment", "1")
 |> html_response(200) =~ "Upvoted comment 2"
 ```
 
 As expected here a post request is done to `/posts/1/comments/2` for the second comment.
 
-If there is no `data-method` set dispatch_link/3 will do a `get` request by
+If there is no `data-method` set `click_link/3` will do a `get` request by
 default.
