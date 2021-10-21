@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <title>Question</title>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+  <div>
+    <h1>Question: What is the package manager for Elixir </h1>
+
+    <form action="/question/2/answer" method="post">
+      <input name="_csrf_token" type="hidden" value="AHIqJmEUAxIvGy4HJ3oUGCMjChsLYBZ-SGgy7W1HElh3PKLsffgXXQO6">
+
+      <label>
+        Hex
+        <input id="answer_option_1" name="answer_option" value="hex" type="radio">
+      </label>
+
+      <label>
+        Bundler
+        <input id="answer_option_2" name="answer_option" value="bundler" type="radio">
+      </label>
+
+      <label>
+        Crates
+        <input id="answer_option_3" name="answer_option" value="crates" type="radio">
+      </label>
+
+
+      <button type="submit" name="direction" value="back">Back</button>
+      <button type="submit" name="direction" value="forward">Next</button>
+    </form>
+  </div>
+</body>
+</html>
