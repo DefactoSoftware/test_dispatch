@@ -77,7 +77,7 @@ defmodule TestDispatch do
   def submit_form(conn, attrs, entity, test_selector),
     do: dispatch_form(conn, attrs, entity, test_selector)
 
-  @spec submit_form(Plug.Conn.t(), %{}, binary()) :: Plug.Conn.t()
+  @spec submit_with_button(Plug.Conn.t(), %{}, binary()) :: Plug.Conn.t()
   def submit_with_button(%Plug.Conn{} = conn, attrs \\ %{}, button_text) do
     {form, _} = find_form(conn, button_text: button_text)
     selector_tuple = {:button_text, button_text}
