@@ -66,7 +66,7 @@ defmodule TestDispatch do
   end
 
   @spec submit_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
-  def submit_form(conn, attrs, entity_or_test_selector),
+  def submit_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil),
     do: dispatch_form(conn, attrs, entity_or_test_selector)
 
   @doc """
