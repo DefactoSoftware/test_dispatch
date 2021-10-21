@@ -317,4 +317,14 @@ defmodule TestDispatch.FormTest do
              }
     end
   end
+
+  describe "submit_with_button/4" do
+    test "submit with 'Next' and go to the next question", %{conn: conn} do
+      assert conn
+             |> get("quiz/1/question/2")
+             |> submit_with_button(%{answer_option: "elixir"}, "Next")
+             |> follow_redirect
+             |> html_response(200) =~ "Question: What is the package manager for Elixir"
+    end
+  end
 end

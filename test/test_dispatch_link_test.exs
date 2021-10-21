@@ -1,21 +1,21 @@
 defmodule TestDispatchLinkTest do
   use TestDispatch.ConnCase
-  doctest TestDispatch, import: true, only: [dispatch_link: 3]
+  doctest TestDispatch, import: true, only: [click_link: 3]
 
   @post_show_body File.read!("test/support/links/_post_show.html")
 
-  describe "dispatch_link" do
+  describe "click_link" do
     test "dispatches a delete by only a test selector", %{conn: conn} do
       assert conn
              |> get("/posts/1")
-             |> dispatch_link("post-123-delete-post")
+             |> click_link("post-123-delete-post")
              |> redirected_to(302) == "/posts"
     end
 
     test "dispatches a post by test selector and test value", %{conn: conn} do
       assert conn
              |> get("/posts/1")
-             |> dispatch_link("post-123-upvote-comment", "1")
+             |> click_link("post-123-upvote-comment", "1")
              |> redirected_to(302) == "/posts/1"
     end
 
@@ -23,7 +23,7 @@ defmodule TestDispatchLinkTest do
       dispatched_conn =
         conn
         |> get("/posts")
-        |> dispatch_link("post-index-1234-post-link", "1")
+        |> click_link("post-index-1234-post-link", "1")
 
       assert dispatched_conn.request_path == "/posts/1"
       assert html_response(dispatched_conn, 200) == @post_show_body
@@ -35,7 +35,7 @@ defmodule TestDispatchLinkTest do
                    fn ->
                      conn
                      |> get("/posts/1")
-                     |> dispatch_link("some-none-existing-selector", "nonexistingvalue")
+                     |> click_link("some-none-existing-selector", "nonexistingvalue")
                    end
     end
 
@@ -45,7 +45,7 @@ defmodule TestDispatchLinkTest do
                    fn ->
                      conn
                      |> get("/posts/1")
-                     |> dispatch_link("some-none-existing-selector")
+                     |> click_link("some-none-existing-selector")
                    end
     end
 
@@ -57,7 +57,7 @@ defmodule TestDispatchLinkTest do
         |> html_response(200)
         |> Floki.parse_fragment!()
         |> Floki.find("[test-selector=post-index-1234-post-item]")
-        |> dispatch_link(conn, "post-index-1234-post-link", "1")
+        |> click_link(conn, "post-index-1234-post-link", "1")
 
       assert dispatched_conn.request_path == "/posts/1"
       assert html_response(dispatched_conn, 200) == @post_show_body
@@ -67,7 +67,7 @@ defmodule TestDispatchLinkTest do
       assert_raise FunctionClauseError, fn ->
         conn
         |> get("/posts/1")
-        |> dispatch_link(%{})
+        |> click_link(%{})
       end
     end
   end

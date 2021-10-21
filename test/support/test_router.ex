@@ -1,7 +1,7 @@
 defmodule TestDispatchTest.Router do
   use Phoenix.Router
   use Plug.ErrorHandler
-  alias TestDispatchTest.{Controller, Post, PostController}
+  alias TestDispatchTest.{Controller, Post, PostController, Quiz}
 
   pipeline :browser do
     plug(:put_bypass, :browser)
@@ -19,6 +19,9 @@ defmodule TestDispatchTest.Router do
     get("/posts/:id", PostController, :show)
     delete("/posts/:id", PostController, :delete)
     post("/posts/:post_id/comments/:id", Post.CommentController, :upvote)
+
+    get("/quiz/:quiz_id/question/:id", Quiz.QuestionController, :show)
+    post("/quiz/:quiz_id/question/:id/answer", Quiz.Question.AnswerController, :create)
   end
 
   def put_bypass(conn, pipeline) do
