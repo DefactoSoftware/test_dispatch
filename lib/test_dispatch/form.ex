@@ -56,7 +56,7 @@ defmodule TestDispatch.Form do
     other_radios =
       radios
       |> Enum.uniq_by(fn {_, list, _} ->
-        list |> Enum.find(fn {key, _} -> "name" == key end) |> elem(1)
+        Enum.find(list, fn {key, _} -> "name" == key end) |> elem(1)
       end)
       |> Enum.reject(fn radio -> floki_attribute(radio, "name") in checked_names end)
 
@@ -138,10 +138,11 @@ defmodule TestDispatch.Form do
   defp key_for_input({"button", _, _} = input, _), do: floki_attribute(input, "name")
 
   defp key_for_input(input, _) do
+    name = floki_attribute(input, "name")
     id = floki_attribute(input, "id")
 
     if floki_attribute(input, "type") == "radio",
-      do: String.replace_suffix(id, "_#{floki_attribute(input, "value")}", ""),
+      do: name,
       else: id
   end
 
