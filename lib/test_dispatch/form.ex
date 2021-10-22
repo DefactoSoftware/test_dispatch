@@ -1,10 +1,13 @@
 defmodule TestDispatch.Form do
   @moduledoc false
-  @form_methods ["post", "put", "delete", "get"]
 
   import Phoenix.ConnTest, only: [dispatch: 5, html_response: 2]
   import Phoenix.Controller, only: [endpoint_module: 1]
   import TestSelector.Test.FlokiHelpers
+  import TestDispatch.Helpers.Error
+  import TestDispatch.Helpers.HTML
+
+  @form_methods ["post", "put", "delete", "get"]
 
   def find_inputs(form, {:entity, _} = entity_tuple),
     do: find_input_fields(form, entity_tuple)
@@ -203,11 +206,7 @@ defmodule TestDispatch.Form do
   end
 
   def find_form(%Plug.Conn{status: status}, _),
-    do:
-      raise(
-        Plug.BadRequestError,
-        "The provided conn had the status #{status} that doesn't fall into the 2xx range"
-      )
+    do: raise_status(status)
 
   def find_form_by(forms, nil), do: {List.last(forms), nil}
 
@@ -216,20 +215,13 @@ defmodule TestDispatch.Form do
 
     if form,
       do: {form, :button_text},
-      else:
-        raise("""
-        No form found for the given button text: #{button_text}
-        Found the button texts:
-
-         #{all_buttons(forms)}
-        """)
+      else: raise_no_button_found(forms, button_text)
   end
 
-  def find_form_by(forms, entity_or_test_selector) do
-    test_selector_result = Enum.find(forms, &find_test_selector(&1, entity_or_test_selector))
+  def find_form_by(forms, selector) do
+    test_selector_result = Enum.find(forms, &find_test_selector(&1, selector))
 
-    entity_result =
-      Enum.find(forms, &(&1 |> Floki.find("*[id^=#{entity_or_test_selector}_]") |> Enum.any?()))
+    entity_result = Enum.find(forms, &(Floki.find(&1, "*[id^=#{selector}_]") |> Enum.any?()))
 
     cond do
       is_tuple(test_selector_result) ->
@@ -239,17 +231,9 @@ defmodule TestDispatch.Form do
         {entity_result, :entity}
 
       true ->
-        raise("No form found for the given test_selector or entity: #{entity_or_test_selector}")
+        raise_no_selector_found(selector)
     end
   end
-
-  @spec floki_attribute(binary | Floki.html_tree(), binary, binary() | nil | none()) ::
-          binary() | nil
-  def floki_attribute(html, select, name \\ nil)
-  def floki_attribute(html, select, nil), do: html |> Floki.attribute(select) |> List.first()
-
-  def floki_attribute(html, select, name),
-    do: html |> Floki.attribute(select, name) |> List.first()
 
   def parse_conn(%{status: status} = conn) do
     conn
@@ -269,16 +253,5 @@ defmodule TestDispatch.Form do
       |> Enum.any?(&(text(&1) == button_text))
 
     input_submit || button_submit
-  end
-
-  def text(html_tree),
-    do: html_tree |> Floki.text() |> String.replace(~r/\s+/, " ") |> String.trim()
-
-  defp all_buttons(html_tree) do
-    all_submit_buttons = html_tree |> Floki.find("button[type=submit]")
-    all_submit_inputs = html_tree |> Floki.find("input[type=submit]")
-
-    (all_submit_inputs ++ all_submit_buttons)
-    |> Enum.map(&(text([&1]) <> "\n "))
   end
 end

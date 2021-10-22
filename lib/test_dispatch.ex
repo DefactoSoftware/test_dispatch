@@ -9,6 +9,7 @@ defmodule TestDispatch do
   import Phoenix.Controller, only: [endpoint_module: 1]
   import TestDispatch.Form
   import TestDispatch.Link
+  import TestDispatch.Helpers.HTML, only: [floki_attribute: 2]
 
   @doc """
   See `submit_form/3` for documentation.
