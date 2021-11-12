@@ -212,7 +212,7 @@ defmodule TestDispatch do
 
   ## Params
 
-    * `:subject` sets
+    * `:subject` only receive mails with the specified subject.
 
   ## Examples
 
@@ -226,17 +226,20 @@ defmodule TestDispatch do
       receive do
         {:delivered_email, %{subject: ^subject} = email} ->
           email
-
-        {:delivered_email, email} ->
-          raise("""
-          Failed to receive email with the expected subject:
-            #{subject}
-          Found email with subject:
-            #{email.subject}
-
-          """)
       after
-        100 -> raise("Failed to receive any email")
+        100 ->
+          raise("Failed to receive any email")
+
+          receive do
+            {:delivered_email, email} ->
+              raise("""
+              Failed to receive email with the expected subject:
+                #{subject}
+              Found email with subject:
+                #{email.subject}
+
+              """)
+          end
       end
 
     %{conn | resp_body: email.html_body}
