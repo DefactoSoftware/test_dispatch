@@ -7,6 +7,7 @@ defmodule TestDispatch do
 
   import Phoenix.ConnTest, only: [dispatch: 4, redirected_to: 2]
   import Phoenix.Controller, only: [endpoint_module: 1]
+  import TestDispatch.Email
   import TestDispatch.Form
   import TestDispatch.Link
 
@@ -221,38 +222,10 @@ defmodule TestDispatch do
       iex> result = click_link(conn, "post-123-show") |> html_response(200)
       iex> if result =~ "Posts 123", do: :ok
   """
-  def receive_mail(conn, %{subject: subject}) do
-    email =
-      receive do
-        {:delivered_email, %{subject: ^subject} = email} ->
-          email
-      after
-        100 ->
-          raise("Failed to receive any email")
+  @spec receive_mail(Plug.Conn.t(), %{}) :: Plug.Conn.t()
 
-          receive do
-            {:delivered_email, email} ->
-              raise("""
-              Failed to receive email with the expected subject:
-                #{subject}
-              Found email with subject:
-                #{email.subject}
-
-              """)
-          end
-      end
-
-    %{conn | resp_body: email.html_body}
-  end
-
-  @doc false
-  def receive_mail(conn) do
-    email =
-      receive do
-        {:delivered_email, email} -> email
-      after
-        100 -> raise("Failed to receive any email")
-      end
+  def receive_mail(conn, email_match \\ %{}) do
+    email = match_receive_mail(email_match)
 
     %{conn | resp_body: email.html_body}
   end
