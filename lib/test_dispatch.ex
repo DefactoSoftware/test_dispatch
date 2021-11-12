@@ -205,4 +205,52 @@ defmodule TestDispatch do
 
     dispatch(conn, endpoint, "get", path)
   end
+
+  @doc """
+  Checks for an incomming mail and puts it on the conn as the resp_html.
+  It returns the conn on which the `click_link/3` can be called.
+
+  ## Params
+
+    * `:subject` sets
+
+  ## Examples
+
+      iex> conn = build_conn() |> get("/posts/1") |> click_link("post-123-send-as-mail")
+      iex> conn = receive_mail(conn, %{subject: "Post 1"})
+      iex> result = click_link(conn, "post-123-show") |> html_response(200)
+      iex> if result =~ "Posts 123", do: :ok
+  """
+  def receive_mail(conn, %{subject: subject}) do
+    email =
+      receive do
+        {:delivered_email, %{subject: ^subject} = email} ->
+          email
+
+        {:delivered_email, email} ->
+          raise("""
+          Failed to receive email with the expected subject:
+            #{subject}
+          Found email with subject:
+            #{email.subject}
+
+          """)
+      after
+        100 -> raise("Failed to receive any email")
+      end
+
+    %{conn | resp_body: email.html_body}
+  end
+
+  @doc false
+  def receive_mail(conn) do
+    email =
+      receive do
+        {:delivered_email, email} -> email
+      after
+        100 -> raise("Failed to receive any email")
+      end
+
+    %{conn | resp_body: email.html_body}
+  end
 end
