@@ -11,6 +11,7 @@ defmodule TestDispatch.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       name: "TestDispatch",
       package: package(),
+      test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test, "coveralls.detail": :test],
       source_url: "https://github.com/DefactoSoftware/test_dispatch",
       start_permanent: Mix.env() == :test,
