@@ -3,6 +3,7 @@ defmodule TestDispatch.Email do
 
   @email_fields [:from, :subject, :to]
 
+  import TestDispatch.Email.Guards
   @doc false
   def match_receive_mail(match) do
     to = Map.get(match, :to)
@@ -10,32 +11,7 @@ defmodule TestDispatch.Email do
     from = Map.get(match, :from)
 
     receive do
-      {:delivered_email, email}
-      when email.to == to and is_nil(subject) and is_nil(from) ->
-        email
-
-      {:delivered_email, email}
-      when email.subject == subject and is_nil(from) and is_nil(to) ->
-        email
-
-      {:delivered_email, email}
-      when email.from == from and is_nil(subject) and is_nil(to) ->
-        email
-
-      {:delivered_email, email}
-      when email.from == from and email.subject == subject and is_nil(to) ->
-        email
-
-      {:delivered_email, email}
-      when email.from == from and email.to == to and is_nil(subject) ->
-        email
-
-      {:delivered_email, email}
-      when email.subject == subject and email.to == to and is_nil(from) ->
-        email
-
-      {:delivered_email, email}
-      when email.from == from and email.to == to and email.subject == subject ->
+      {:delivered_email, email} when email_matches?(email, from, subject, to) ->
         email
     after
       100 -> raise_with_receive(match)
