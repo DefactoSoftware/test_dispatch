@@ -25,7 +25,7 @@ by adding `test_dispatch` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:test_dispatch, "~> 0.3.0"}
+    {:test_dispatch, "~> 0.3.1"}
   ]
 end
 ```
