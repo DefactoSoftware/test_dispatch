@@ -102,6 +102,7 @@ defmodule TestDispatch do
   """
   @spec dispatch_link(nil | Floki.html_tree(), Plug.Conn.t(), binary(), binary() | nil) ::
           Plug.Conn.t()
+  @spec dispatch_link(Plug.Conn.t(), binary(), binary() | nil, nil) :: Plug.Conn.t()
   def dispatch_link(floki_tree \\ nil, conn, test_selector, test_value \\ nil)
 
   def dispatch_link(nil, %Plug.Conn{} = conn, test_selector, test_value),

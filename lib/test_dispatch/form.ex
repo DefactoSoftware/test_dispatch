@@ -101,7 +101,7 @@ defmodule TestDispatch.Form do
 
           Map.put(acc, key, new_nested_list)
 
-        {} ->
+        _ ->
           acc
       end
     end)
@@ -243,7 +243,11 @@ defmodule TestDispatch.Form do
     end
   end
 
-  @spec floki_attribute(binary | Floki.html_tree(), binary, binary() | nil | none()) ::
+  @spec floki_attribute(
+          binary | Floki.html_tree() | Floki.html_node(),
+          binary,
+          binary() | nil | none()
+        ) ::
           binary() | nil
   def floki_attribute(html, select, name \\ nil)
   def floki_attribute(html, select, nil), do: html |> Floki.attribute(select) |> List.first()
