@@ -35,7 +35,7 @@ without using headless browsers.",
   defp deps do
     [
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 0.5", only: [:dev, :test]},
+      {:dialyxir, "~> 1.0", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.7", only: :test},
       {:floki, "> 0.28.0"},
