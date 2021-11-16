@@ -191,5 +191,3 @@ receive mail in a map.
 ```elixir
 receive_mail(conn, %{submit: "This exact message", to: "this_address@exmaple.com"})
 ```
-
-

@@ -4,7 +4,7 @@
 
 # TestDispatch
 
-A library that adds the ability to use controller tests as integration tests
+TestDispatch adds the ability to use controller tests as integration tests
 without using headless browsers. It allows tests to submit forms, click on
 links, follow redirects and receive mails.
 
@@ -93,7 +93,7 @@ Ultimately, the conn is dispatched to the conn's `private.phoenix_endpoint`
 using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
 action found in the form.
 
-## Clicking on links in mails
+### Clicking on links in mails
 
 During the tests emails might be send that we want to integrate in our flow. For
 that there is `receive_mail/2`. It expects the conn as the first argument and
