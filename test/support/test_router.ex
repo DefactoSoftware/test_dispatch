@@ -19,6 +19,7 @@ defmodule TestDispatchTest.Router do
     get("/posts/:id", PostController, :show)
     delete("/posts/:id", PostController, :delete)
     post("/posts/:post_id/comments/:id", Post.CommentController, :upvote)
+    get("/posts/:post_id/send_mail", Post.MailController, :send)
 
     get("/quiz/:quiz_id/question/:id", Quiz.QuestionController, :show)
     post("/quiz/:quiz_id/question/:id/answer", Quiz.Question.AnswerController, :create)

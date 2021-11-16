@@ -7,6 +7,7 @@ defmodule TestDispatch do
 
   import Phoenix.ConnTest, only: [dispatch: 4, redirected_to: 2]
   import Phoenix.Controller, only: [endpoint_module: 1]
+  import TestDispatch.Email
   import TestDispatch.Form
   import TestDispatch.Link
 
@@ -87,7 +88,7 @@ defmodule TestDispatch do
   ## Examples
 
       iex> submit_with_button(conn, %{answer_option: "elixir"}, "Finish Quiz")
-      %Plug.Conn{params: %{"answer_option" => "elixir"})
+      %Plug.Conn{params: %{"answer_option" => "elixir"}}
   """
   @spec submit_with_button(Plug.Conn.t(), %{}, binary()) :: Plug.Conn.t()
   def submit_with_button(%Plug.Conn{} = conn, attrs \\ %{}, button_text) do
@@ -204,5 +205,30 @@ defmodule TestDispatch do
     endpoint = endpoint_module(conn)
 
     dispatch(conn, endpoint, "get", path)
+  end
+
+  @doc """
+  Checks for an incomming mail and puts it on the conn as the resp_html.
+  It returns the conn on which the `click_link/3` can be called.
+
+  ## Params
+
+    * `:subject` Match the received mail to the subject
+    * `:to` Match the received mail to the receiver of the mail
+    * `:from` Match the received mail to the sender of the mail
+
+  ## Examples
+
+      iex> conn = build_conn() |> get("/posts/1") |> click_link("post-123-send-as-mail")
+      iex> conn = receive_mail(conn, %{subject: "Post 1"})
+      iex> result = click_link(conn, "post-123-show") |> html_response(200)
+      iex> if result =~ "Posts 123", do: :ok
+  """
+  @spec receive_mail(Plug.Conn.t(), %{}) :: Plug.Conn.t()
+
+  def receive_mail(conn, email_match \\ %{}) do
+    email = match_receive_mail(email_match)
+
+    %{conn | resp_body: email.html_body}
   end
 end

@@ -6,17 +6,19 @@ defmodule TestDispatch.MixProject do
       app: :test_dispatch,
       deps: deps(),
       docs: docs(),
-      description: "Helper to test dispatches of Phoenix forms and links in Elixir applications",
+      description: "A library that adds the ability to use controller tests as integration tests
+without using headless browsers.",
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       name: "TestDispatch",
       package: package(),
+      test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test, "coveralls.detail": :test],
       source_url: "https://github.com/DefactoSoftware/test_dispatch",
       start_permanent: Mix.env() == :test,
       test_coverage: [tool: ExCoveralls],
       dialyzer: [plt_add_apps: [:mix, :ex_unit], check_plt: true],
-      version: "0.3.0"
+      version: "0.3.1"
     ]
   end
 
