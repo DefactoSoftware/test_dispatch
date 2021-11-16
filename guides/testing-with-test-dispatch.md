@@ -162,3 +162,34 @@ As expected here a post request is done to `/posts/1/comments/2` for the second 
 
 If there is no `data-method` set `click_link/3` will do a `get` request by
 default.
+
+## Clicking on links in mails
+
+During the tests emails might be send that we want to integrate in our flow. For
+that there is `receive_mail/2`. It expects the conn as the first argument and
+the found email will be added to the conn as the `resp_body`. By using the conn
+for this, this can now be combined with the `click_link/4` function and "click" on
+the link in an email.
+
+```elixir
+build_conn()
+|> get("/posts/1")
+|> click_link("post-123-send-as-mail")
+|> receive_mail()
+|> click_link("post-123-show")
+|> html_response(200)
+```
+
+TestDispatch expects the email to be send with the message
+`{:delivered_email, %{} = email}` where the mail should contain at least
+the `to:`, `from:` and `subject:`, `html_body:` fields.
+
+When the mail is not received it will raise an error. Specific emails can be
+targeted by adding the `:subject`, `:to` or `:from` to the second argument of
+receive mail in a map.
+
+```elixir
+receive_mail(conn, %{submit: "This exact message", to: "this_address@exmaple.com"})
+```
+
+

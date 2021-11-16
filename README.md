@@ -4,9 +4,9 @@
 
 # TestDispatch
 
-Helper to test the dispatch of Phoenix forms in Elixir applications. This will
-make it easier to write integration tests to check if forms in Phoenix templates
-will submit to the intended controller action with the right params.
+A library that adds the ability to use controller tests as integration tests
+without using headless browsers. It allows tests to submit forms, click on
+links, follow redirects and receive mails.
 
 ## Documentation
 
@@ -30,8 +30,10 @@ def deps do
 end
 ```
 
-## Use
+## Usage
 
+
+### submit_form
 Import TestDispatch in your test module or your test case and you can call
 `submit_form/3` from there.
 
@@ -90,3 +92,32 @@ this will result in the following params:
 Ultimately, the conn is dispatched to the conn's `private.phoenix_endpoint`
 using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
 action found in the form.
+
+## Clicking on links in mails
+
+During the tests emails might be send that we want to integrate in our flow. For
+that there is `receive_mail/2`. It expects the conn as the first argument and
+the found email will be added to the conn as the `resp_body`. By using the conn
+for this, this can now be combined with the `click_link/4` function and "click" on
+the link in an email.
+
+```elixir
+build_conn()
+|> get("/posts/1")
+|> click_link("post-123-send-as-mail")
+|> receive_mail()
+|> click_link("post-123-show")
+|> html_response(200)
+```
+
+TestDispatch expects the email to be send with the message
+`{:delivered_email, %{} = email}` where the mail should contain at least
+the `to:`, `from:` and `subject:`, `html_body:` fields.
+
+When the mail is not received it will raise an error. Specific emails can be
+targeted by adding the `:subject`, `:to` or `:from` to the second argument of
+receive mail in a map.
+
+```elixir
+receive_mail(conn, %{submit: "This exact message", to: "this_address@exmaple.com"})
+```

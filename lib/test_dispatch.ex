@@ -88,7 +88,7 @@ defmodule TestDispatch do
   ## Examples
 
       iex> submit_with_button(conn, %{answer_option: "elixir"}, "Finish Quiz")
-      %Plug.Conn{params: %{"answer_option" => "elixir"})
+      %Plug.Conn{params: %{"answer_option" => "elixir"}}
   """
   @spec submit_with_button(Plug.Conn.t(), %{}, binary()) :: Plug.Conn.t()
   def submit_with_button(%Plug.Conn{} = conn, attrs \\ %{}, button_text) do
@@ -213,12 +213,16 @@ defmodule TestDispatch do
 
   ## Params
 
-    * `:subject` only receive mails with the specified subject.
+    * `:subject` Match the received mail to the subject
+    * `:to` Match the received mail to the receiver of the mail
+    * `:from` Match the received mail to the sender of the mail
 
   ## Examples
 
       iex> conn = build_conn() |> get("/posts/1") |> click_link("post-123-send-as-mail")
+
       iex> conn = receive_mail(conn, %{subject: "Post 1"})
+
       iex> result = click_link(conn, "post-123-show") |> html_response(200)
       iex> if result =~ "Posts 123", do: :ok
   """
