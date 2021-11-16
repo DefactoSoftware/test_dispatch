@@ -220,9 +220,7 @@ defmodule TestDispatch do
   ## Examples
 
       iex> conn = build_conn() |> get("/posts/1") |> click_link("post-123-send-as-mail")
-
       iex> conn = receive_mail(conn, %{subject: "Post 1"})
-
       iex> result = click_link(conn, "post-123-show") |> html_response(200)
       iex> if result =~ "Posts 123", do: :ok
   """
