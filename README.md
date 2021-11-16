@@ -95,11 +95,11 @@ action found in the form.
 
 ### Clicking on links in mails
 
-During the tests emails might be send that we want to integrate in our flow. For
+During the tests emails might be sent that we want to integrate in our flow. For
 that there is `receive_mail/2`. It expects the conn as the first argument and
-the found email will be added to the conn as the `resp_body`. By using the conn
-for this, this can now be combined with the `click_link/4` function and "click" on
-the link in an email.
+the found email will be added to the conn as the `resp_body`. Using the conn
+combined with the `click_link/4` function you can simulate "clicking" on the
+link in an email.
 
 ```elixir
 build_conn()
@@ -110,7 +110,7 @@ build_conn()
 |> html_response(200)
 ```
 
-TestDispatch expects the email to be send with the message
+TestDispatch expects the email to be sent with the message
 `{:delivered_email, %{} = email}` where the mail should contain at least
 the `to:`, `from:` and `subject:`, `html_body:` fields.
 

@@ -9,42 +9,42 @@ defmodule TestDispatch.ReceiveMailTest do
              |> receive_mail(%{subject: "Post 1", to: "other@example.com", from: "me@app.com"})
     end
 
-    test "receive email with expected_fields:: [subject, to]", %{conn: conn} do
+    test "receive email with expected_fields: [subject, to]", %{conn: conn} do
       assert conn
              |> get("/posts/1")
              |> click_link("post-123-send-as-mail")
              |> receive_mail(%{subject: "Post 1", to: "other@example.com"})
     end
 
-    test "receive email with expected_fields:: [subject, from]", %{conn: conn} do
+    test "receive email with expected_fields: [subject, from]", %{conn: conn} do
       assert conn
              |> get("/posts/1")
              |> click_link("post-123-send-as-mail")
              |> receive_mail(%{subject: "Post 1", from: "me@app.com"})
     end
 
-    test "receive email with expected_fields:: [to, from]", %{conn: conn} do
+    test "receive email with expected_fields: [to, from]", %{conn: conn} do
       assert conn
              |> get("/posts/1")
              |> click_link("post-123-send-as-mail")
              |> receive_mail(%{to: "other@example.com", from: "me@app.com"})
     end
 
-    test "receive email with expected_fields:: [from]", %{conn: conn} do
+    test "receive email with expected_fields: [from]", %{conn: conn} do
       assert conn
              |> get("/posts/1")
              |> click_link("post-123-send-as-mail")
              |> receive_mail(%{from: "me@app.com"})
     end
 
-    test "receive email with expected_fields:: [to]", %{conn: conn} do
+    test "receive email with expected_fields: [to]", %{conn: conn} do
       assert conn
              |> get("/posts/1")
              |> click_link("post-123-send-as-mail")
              |> receive_mail(%{to: "other@example.com"})
     end
 
-    test "receive email with expected_fields:: [subject]", %{conn: conn} do
+    test "receive email with expected_fields: [subject]", %{conn: conn} do
       assert conn
              |> get("/posts/1")
              |> click_link("post-123-send-as-mail")
