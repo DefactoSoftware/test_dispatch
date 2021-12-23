@@ -87,25 +87,25 @@ defmodule TestDispatch.Form do
   def prepend_entity(attrs, _), do: attrs
 
   def update_input_values(list, attrs \\ %{}) do
-    Enum.reduce(list, %{}, fn item, acc ->
-      case item do
-        {key, value} ->
-          Map.put(acc, key, Map.get(attrs, key, value))
+    Enum.reduce(list, %{}, fn {keys, form_value}, acc ->
+      keys = Enum.map(keys, &String.to_atom/1)
+      value = get_in(attrs, keys) || form_value
 
-        {key, index, {nested_key, value}} = tuple ->
-          nested_attr =
-            attrs |> Map.get(key, []) |> Enum.at(index, %{}) |> Map.get(nested_key, value)
-
-          acc_nested_list = Map.get(acc, key, false)
-          new_nested_list = update_nested_input_values(acc_nested_list, tuple, nested_attr)
-
-          Map.put(acc, key, new_nested_list)
-
-        _ ->
-          acc
-      end
+      keys
+      |> Enum.reverse()
+      |> Enum.reduce(value, &Map.new([{&1, &2}]))
+      |> Enum.into(%{})
+      |> deep_merge(acc)
     end)
   end
+
+  defp deep_merge(map1, map2) when is_map(map1) and is_map(map2) do
+    Map.merge(map1, map2, fn _key, value_1, value2 ->
+      deep_merge(value_1, value2)
+    end)
+  end
+
+  defp deep_merge(_original, preceding), do: preceding
 
   def input_to_tuple(input, entity_tuple) do
     value = input |> elem(0) |> _input_to_tuple([input])
@@ -125,14 +125,9 @@ defmodule TestDispatch.Form do
     do: input |> Floki.find("option[selected=selected]") |> floki_attribute("value")
 
   defp key_for_input(input, {:entity, entity}) do
-    id = input |> floki_attribute("id")
+    id = input |> floki_attribute("name")
 
-    key =
-      if floki_attribute(input, "type") == "radio",
-        do: String.replace_suffix(id, "_#{floki_attribute(input, "value")}", ""),
-        else: id
-
-    String.replace_prefix(key, "#{entity}_", "")
+    String.replace_prefix(id, "#{entity}", "")
   end
 
   defp key_for_input({"button", _, _} = input, _), do: floki_attribute(input, "name")
@@ -143,25 +138,12 @@ defmodule TestDispatch.Form do
 
     if floki_attribute(input, "type") == "radio",
       do: name,
-      else: id
+      else: name
   end
 
   defp resolve_nested(nil), do: nil
 
-  defp resolve_nested(key) do
-    case Regex.split(~r{_\d*_}, key, include_captures: true) do
-      [key, capture, nested_key] ->
-        index =
-          capture
-          |> String.replace("_", "")
-          |> String.to_integer()
-
-        {String.to_atom(key), index, String.to_atom(nested_key)}
-
-      _ ->
-        String.to_atom(key)
-    end
-  end
+  defp resolve_nested(key), do: String.split(key, ["[", "]"], trim: true)
 
   defp update_nested_input_values(false, {_, _, {nested_key, _}}, nested_attr),
     do: [Map.put(%{}, nested_key, nested_attr)]

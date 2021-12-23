@@ -28,7 +28,10 @@ defmodule TestDispatch.FormTest do
                  "description" => "Just a regular joe",
                  "roles" => ["admin", "moderator"],
                  "color" => "green",
-                 "cats" => [%{"name" => "Joe", "age" => 21}, %{"name" => "Jane", "age" => 8}]
+                 "cats" => %{
+                   "0" => %{"age" => nil, "name" => nil},
+                   "1" => %{"age" => nil, "name" => nil}
+                 }
                }
              }
     end
@@ -54,7 +57,10 @@ defmodule TestDispatch.FormTest do
                  "email" => "john@doe.com",
                  "description" => "Just a regular joe",
                  "roles" => ["admin", "moderator"],
-                 "cats" => [%{"name" => nil, "age" => nil}, %{"name" => nil, "age" => nil}],
+                 "cats" => %{
+                   "0" => %{"name" => nil, "age" => nil},
+                   "1" => %{"name" => nil, "age" => nil}
+                 },
                  "color" => "red"
                }
              }
@@ -75,7 +81,10 @@ defmodule TestDispatch.FormTest do
                  "email" => nil,
                  "description" => "",
                  "roles" => nil,
-                 "cats" => [%{"name" => nil, "age" => nil}, %{"name" => nil, "age" => nil}],
+                 "cats" => %{
+                   "0" => %{"age" => nil, "name" => nil},
+                   "1" => %{"age" => nil, "name" => nil}
+                 },
                  "color" => "red"
                }
              }
