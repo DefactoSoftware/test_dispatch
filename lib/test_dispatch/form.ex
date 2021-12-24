@@ -89,7 +89,8 @@ defmodule TestDispatch.Form do
   def update_input_values(list, attrs \\ %{}) do
     Enum.reduce(list, %{}, fn {keys, form_value}, acc ->
       atom_keys = keys |> Enum.map(&String.to_atom/1)
-      value = get_in(attrs, atom_keys) || form_value
+      temp_value = get_in(attrs, atom_keys)
+      value = if is_nil(temp_value), do: form_value, else: temp_value
 
       atom_keys
       |> Enum.reverse()
