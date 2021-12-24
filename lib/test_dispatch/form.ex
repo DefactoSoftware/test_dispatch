@@ -244,14 +244,15 @@ defmodule TestDispatch.Form do
 
   defp deep_merge(_original, preceding), do: preceding
 
-  defp get_in_map(map, [key], default_value) do
-    Map.get(map, key, default_value)
-  end
+  defp get_in_map(nil, [_], default_value), do: default_value
+  defp get_in_map(map, [key], default_value), do: Map.get(map, key, default_value)
 
   defp get_in_map(nil, [_ | _], default_value), do: default_value
 
-  defp get_in_map(map, [key | keys], default_value) do
+  defp get_in_map(map, [key | keys], default_value) when is_map(map) do
     value = Map.get(map, key)
     get_in_map(value, keys, default_value)
   end
+
+  defp get_in_map(_, _, default_value), do: default_value
 end
