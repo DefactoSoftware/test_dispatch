@@ -116,9 +116,9 @@ defmodule TestDispatch.Form do
     do: input |> Floki.find("option[selected=selected]") |> floki_attribute("value")
 
   defp key_for_input(input, {:entity, entity}) do
-    id = input |> floki_attribute("name")
+    name = input |> floki_attribute("name")
 
-    String.replace_prefix(id, "#{entity}", "")
+    String.replace_prefix(name, "#{entity}", "")
   end
 
   defp key_for_input({"button", _, _} = input, _), do: floki_attribute(input, "name")
