@@ -335,5 +335,13 @@ defmodule TestDispatch.FormTest do
              |> follow_redirect
              |> html_response(200) =~ "Question: What is the package manager for Elixir"
     end
+
+    test "rejects empty values when a buttons value/name is empty", %{conn: conn} do
+      assert conn
+             |> get("quiz/1/question/2")
+             |> submit_with_button(%{email: "marcel@defacto.nl"}, "Helpline")
+             |> follow_redirect
+             |> html_response(200) =~ "Question: Which language is a functional one"
+    end
   end
 end

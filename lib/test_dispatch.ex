@@ -67,6 +67,7 @@ defmodule TestDispatch do
     form
     |> find_inputs(selector_tuple)
     |> Enum.map(&input_to_tuple(&1, selector_tuple))
+    |> Enum.reject(&is_nil(&1))
     |> update_input_values(attrs)
     |> prepend_entity(selector_tuple)
     |> send_to_action(form, conn)

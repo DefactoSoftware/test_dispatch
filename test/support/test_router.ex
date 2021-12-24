@@ -23,6 +23,7 @@ defmodule TestDispatchTest.Router do
 
     get("/quiz/:quiz_id/question/:id", Quiz.QuestionController, :show)
     post("/quiz/:quiz_id/question/:id/answer", Quiz.Question.AnswerController, :create)
+    post("/quiz/:quiz_id/question/:id/helpline", Quiz.Question.HelplineController, :create)
   end
 
   def put_bypass(conn, pipeline) do
