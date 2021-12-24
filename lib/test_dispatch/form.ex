@@ -87,7 +87,9 @@ defmodule TestDispatch.Form do
   def prepend_entity(attrs, _), do: attrs
 
   def update_input_values(list, attrs \\ %{}) do
-    Enum.reduce(list, %{}, fn {keys, form_value}, acc ->
+    list
+    |> Enum.reject(&reject_empty_tuples/1)
+    |> Enum.reduce(%{}, fn {keys, form_value}, acc ->
       keys = Enum.map(keys, &String.to_atom/1)
       value = get_in(attrs, keys) || form_value
 
@@ -98,6 +100,9 @@ defmodule TestDispatch.Form do
       |> deep_merge(acc)
     end)
   end
+
+  defp reject_empty_tuples({}), do: true
+  defp reject_empty_tuples(_), do: false
 
   def input_to_tuple(input, entity_tuple) do
     value = input |> elem(0) |> _input_to_tuple([input])
