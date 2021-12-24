@@ -88,10 +88,10 @@ defmodule TestDispatch.Form do
 
   def update_input_values(list, attrs \\ %{}) do
     Enum.reduce(list, %{}, fn {keys, form_value}, acc ->
-      value = get_in(attrs, keys) || form_value
+      atom_keys = keys |> Enum.map(&String.to_atom/1)
+      value = get_in(attrs, atom_keys) || form_value
 
-      keys
-      |> Enum.map(&String.to_atom/1)
+      atom_keys
       |> Enum.reverse()
       |> Enum.reduce(value, &Map.new([{&1, &2}]))
       |> deep_merge(acc)
