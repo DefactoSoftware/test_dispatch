@@ -89,7 +89,7 @@ defmodule TestDispatch.Form do
   def update_input_values(list, attrs \\ %{}) do
     Enum.reduce(list, %{}, fn {keys, form_value}, acc ->
       atom_keys = keys |> Enum.map(&String.to_atom/1)
-      value = get_in(attrs, atom_keys) || form_value
+      value = get_in_map(attrs, atom_keys, form_value)
 
       atom_keys
       |> Enum.reverse()
@@ -243,4 +243,16 @@ defmodule TestDispatch.Form do
   end
 
   defp deep_merge(_original, preceding), do: preceding
+
+  defp get_in_map(nil, [_], default_value), do: default_value
+  defp get_in_map(map, [key], default_value), do: Map.get(map, key, default_value)
+
+  defp get_in_map(nil, [_ | _], default_value), do: default_value
+
+  defp get_in_map(map, [key | keys], default_value) when is_map(map) do
+    value = Map.get(map, key)
+    get_in_map(value, keys, default_value)
+  end
+
+  defp get_in_map(_, _, default_value), do: default_value
 end
