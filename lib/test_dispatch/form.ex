@@ -99,20 +99,11 @@ defmodule TestDispatch.Form do
     end)
   end
 
-  defp deep_merge(map1, map2) when is_map(map1) and is_map(map2) do
-    Map.merge(map1, map2, fn _key, value_1, value2 ->
-      deep_merge(value_1, value2)
-    end)
-  end
-
-  defp deep_merge(_original, preceding), do: preceding
-
   def input_to_tuple(input, entity_tuple) do
     value = input |> elem(0) |> _input_to_tuple([input])
 
     case input |> key_for_input(entity_tuple) |> resolve_nested() do
       nil -> {}
-      {key, index, nested_key} -> {key, index, {nested_key, value}}
       key -> {key, value}
     end
   end
@@ -134,7 +125,6 @@ defmodule TestDispatch.Form do
 
   defp key_for_input(input, _) do
     name = floki_attribute(input, "name")
-    id = floki_attribute(input, "id")
 
     if floki_attribute(input, "type") == "radio",
       do: name,
@@ -144,16 +134,6 @@ defmodule TestDispatch.Form do
   defp resolve_nested(nil), do: nil
 
   defp resolve_nested(key), do: String.split(key, ["[", "]"], trim: true)
-
-  defp update_nested_input_values(false, {_, _, {nested_key, _}}, nested_attr),
-    do: [Map.put(%{}, nested_key, nested_attr)]
-
-  defp update_nested_input_values(acc_nested_list, {_, index, {nested_key, _}}, nested_attr)
-       when length(acc_nested_list) > index,
-       do: List.update_at(acc_nested_list, index, &Map.put(&1, nested_key, nested_attr))
-
-  defp update_nested_input_values(acc_nested_list, {_, index, {nested_key, _}}, nested_attr),
-    do: List.insert_at(acc_nested_list, index, Map.put(%{}, nested_key, nested_attr))
 
   def send_to_action(params, form, conn) do
     endpoint = endpoint_module(conn)
@@ -267,4 +247,12 @@ defmodule TestDispatch.Form do
     (all_submit_inputs ++ all_submit_buttons)
     |> Enum.map(&(text([&1]) <> "\n "))
   end
+
+  defp deep_merge(map1, map2) when is_map(map1) and is_map(map2) do
+    Map.merge(map1, map2, fn _key, value_1, value2 ->
+      deep_merge(value_1, value2)
+    end)
+  end
+
+  defp deep_merge(_original, preceding), do: preceding
 end
