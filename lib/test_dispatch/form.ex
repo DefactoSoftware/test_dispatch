@@ -88,13 +88,12 @@ defmodule TestDispatch.Form do
 
   def update_input_values(list, attrs \\ %{}) do
     Enum.reduce(list, %{}, fn {keys, form_value}, acc ->
-      keys = Enum.map(keys, &String.to_atom/1)
-      value = get_in(attrs, keys) || form_value
+      atom_keys = keys |> Enum.map(&String.to_atom/1)
+      value = get_in(attrs, atom_keys) || form_value
 
-      keys
+      atom_keys
       |> Enum.reverse()
       |> Enum.reduce(value, &Map.new([{&1, &2}]))
-      |> Enum.into(%{})
       |> deep_merge(acc)
     end)
   end
@@ -103,7 +102,7 @@ defmodule TestDispatch.Form do
     value = input |> elem(0) |> _input_to_tuple([input])
 
     case input |> key_for_input(entity_tuple) |> resolve_nested() do
-      nil -> {}
+      nil -> nil
       key -> {key, value}
     end
   end
