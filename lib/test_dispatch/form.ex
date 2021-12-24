@@ -116,20 +116,12 @@ defmodule TestDispatch.Form do
     do: input |> Floki.find("option[selected=selected]") |> floki_attribute("value")
 
   defp key_for_input(input, {:entity, entity}) do
-    name = input |> floki_attribute("name")
+    name = floki_attribute(input, "name")
 
     String.replace_prefix(name, "#{entity}", "")
   end
 
-  defp key_for_input({"button", _, _} = input, _), do: floki_attribute(input, "name")
-
-  defp key_for_input(input, _) do
-    name = floki_attribute(input, "name")
-
-    if floki_attribute(input, "type") == "radio",
-      do: name,
-      else: name
-  end
+  defp key_for_input(input, _), do: floki_attribute(input, "name")
 
   defp resolve_nested(nil), do: nil
 
