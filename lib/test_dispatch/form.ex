@@ -12,9 +12,7 @@ defmodule TestDispatch.Form do
   def find_inputs(form, {:button_text, button_text}) do
     button = find_buttons(form, button_text)
 
-    if button,
-      do: [button | find_default_inputs(form)],
-      else: find_default_inputs(form)
+    [button | find_default_inputs(form)]
   end
 
   def find_inputs(form, _) do
