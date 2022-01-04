@@ -11,12 +11,13 @@
 <body>
   <div>
     <h1>New user</h1>
-    <form action="/" method="post">
+    <form action="/users" >
       <button type="submit">Random other form</button>
     </form>
 
-    <form action="/users/1" method="put" test-selector="user-profile">
+    <form action="/users/1"  test-selector="user-profile">
       <input name="_csrf_token" type="hidden" value="AHIqJmEUAxIvGy4HJ3oUGCMjChsLYBZ-SGgy7W1HElh3PKLsffgXXQO6">
+      <input name="_method" type="hidden" value="put">
 
       <label>Name</label>
       <input id="user_name" label="Name" name="user[name]" type="text">
