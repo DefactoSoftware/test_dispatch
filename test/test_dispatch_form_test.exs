@@ -296,6 +296,19 @@ defmodule TestDispatch.FormTest do
     end)
   end
 
+  test "raise if the conn has a status outside the 200 range", %{conn: conn} do
+    error_text = "The provided conn had the status 301 that doesn't fall into the 2xx range"
+
+    conn =
+      conn
+      |> Plug.Conn.put_resp_content_type("text/html")
+      |> Plug.Conn.resp(301, "<html></html>")
+
+    assert_raise RuntimeError, error_text, fn ->
+      submit_form(conn, :user)
+    end
+  end
+
   describe "form with entity AND test_selector" do
     test "use both the entity and selector to dispatch the right form", %{conn: conn} do
       attrs = %{
