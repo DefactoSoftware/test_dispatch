@@ -232,8 +232,7 @@ defmodule TestDispatch.Form do
     all_submit_buttons = html_tree |> Floki.find("button[type=submit]")
     all_submit_inputs = html_tree |> Floki.find("input[type=submit]")
 
-    (all_submit_inputs ++ all_submit_buttons)
-    |> Enum.map(&(text([&1]) <> "\n "))
+    (all_submit_inputs ++ all_submit_buttons) |> Enum.map_join("\n ", &text(&1))
   end
 
   defp deep_merge(map1, map2) when is_map(map1) and is_map(map2) do

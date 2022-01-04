@@ -343,5 +343,22 @@ defmodule TestDispatch.FormTest do
              |> follow_redirect
              |> html_response(200) =~ "Question: Which language is a functional one"
     end
+
+    test "raises an error when no button by that text was found", %{conn: conn} do
+      raise_text = """
+      No form found for the given button text: Not Found Button
+      Found the button texts:
+
+       Back
+       Next
+       Helpline
+      """
+
+      assert_raise RuntimeError, raise_text, fn ->
+        conn
+        |> get("quiz/1/question/2")
+        |> submit_with_button(%{email: "marcel@defacto.nl"}, "Not Found Button")
+      end
+    end
   end
 end
