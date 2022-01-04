@@ -153,11 +153,7 @@ defmodule TestDispatch.Form do
   end
 
   def find_form(%Plug.Conn{status: status}, _),
-    do:
-      raise(
-        Plug.BadRequestError,
-        "The provided conn had the status #{status} that doesn't fall into the 2xx range"
-      )
+    do: raise("The provided conn had the status #{status} that doesn't fall into the 2xx range")
 
   def find_form_by(forms, nil), do: {List.last(forms), nil}
 
