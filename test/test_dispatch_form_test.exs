@@ -296,6 +296,19 @@ defmodule TestDispatch.FormTest do
     end)
   end
 
+  test "raise if the conn has a status outside the 200 range", %{conn: conn} do
+    error_text = "The provided conn had the status 301 that doesn't fall into the 2xx range"
+
+    conn =
+      conn
+      |> Plug.Conn.put_resp_content_type("text/html")
+      |> Plug.Conn.resp(301, "<html></html>")
+
+    assert_raise RuntimeError, error_text, fn ->
+      submit_form(conn, :user)
+    end
+  end
+
   describe "form with entity AND test_selector" do
     test "use both the entity and selector to dispatch the right form", %{conn: conn} do
       attrs = %{
@@ -342,6 +355,23 @@ defmodule TestDispatch.FormTest do
              |> submit_with_button(%{email: "marcel@defacto.nl"}, "Helpline")
              |> follow_redirect
              |> html_response(200) =~ "Question: Which language is a functional one"
+    end
+
+    test "raises an error when no button by that text was found", %{conn: conn} do
+      raise_text = """
+      No form found for the given button text: Not Found Button
+      Found the button texts:
+
+       Back
+       Next
+       Helpline
+      """
+
+      assert_raise RuntimeError, raise_text, fn ->
+        conn
+        |> get("quiz/1/question/2")
+        |> submit_with_button(%{email: "marcel@defacto.nl"}, "Not Found Button")
+      end
     end
   end
 end

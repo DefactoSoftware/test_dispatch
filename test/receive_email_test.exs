@@ -1,5 +1,5 @@
 defmodule TestDispatch.ReceiveMailTest do
-  use TestDispatch.ConnCase
+  use TestDispatch.ConnCase, async: true
 
   describe "receive_mail" do
     test "receive email with expected_fields: [subject, to, from]", %{conn: conn} do
