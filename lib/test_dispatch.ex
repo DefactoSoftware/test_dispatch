@@ -12,37 +12,6 @@ defmodule TestDispatch do
   import TestDispatch.Link
 
   @doc """
-  See `submit_form/3` for documentation.
-  """
-  @spec dispatch_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
-  def dispatch_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
-
-  def dispatch_form(%Plug.Conn{} = conn, %{} = attrs, entity_or_test_selector)
-      when is_binary(entity_or_test_selector) or
-             is_nil(entity_or_test_selector) or
-             is_atom(entity_or_test_selector) do
-    {form, selector_type} = find_form(conn, entity_or_test_selector)
-    selector_tuple = {selector_type, entity_or_test_selector}
-
-    _dispatch_form(conn, form, selector_tuple, attrs)
-  end
-
-  def dispatch_form(conn, entity_or_test_selector, nil),
-    do: dispatch_form(conn, %{}, entity_or_test_selector)
-
-  @doc """
-  See `submit_form/3` for documentation.
-  """
-  @spec dispatch_form(Plug.Conn.t(), %{}, atom(), binary()) :: Plug.Conn.t()
-
-  def dispatch_form(%Plug.Conn{} = conn, %{} = attrs, entity, test_selector) do
-    {form, _} = find_form(conn, test_selector)
-    selector_tuple = {:entity, entity}
-
-    _dispatch_form(conn, form, selector_tuple, attrs)
-  end
-
-  @doc """
   Will find a form in the HTML response of the given conn by entity or by
   `TestSelector`, or, if no entity or test_selector is provided, it will target
   the last form found in the response.
@@ -58,29 +27,33 @@ defmodule TestDispatch do
   using `Phoenix.ConnTest.dispatch/5`, with the params and with the method and
   action found in the form.
   """
-
   @spec submit_form(Plug.Conn.t(), %{}, binary() | atom() | nil) :: Plug.Conn.t()
-  def submit_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil),
-    do: dispatch_form(conn, attrs, entity_or_test_selector)
+  def submit_form(conn, attrs \\ %{}, entity_or_test_selector \\ nil)
 
-  defp _dispatch_form(conn, form, selector_tuple, attrs) do
-    form
-    |> find_inputs(selector_tuple)
-    |> Enum.map(&input_to_tuple(&1, selector_tuple))
-    |> Enum.reject(&is_nil(&1))
-    |> update_input_values(attrs)
-    |> prepend_entity(selector_tuple)
-    |> send_to_action(form, conn)
+  def submit_form(%Plug.Conn{} = conn, %{} = attrs, entity_or_test_selector)
+      when is_binary(entity_or_test_selector) or
+             is_nil(entity_or_test_selector) or
+             is_atom(entity_or_test_selector) do
+    {form, selector_type} = find_form(conn, entity_or_test_selector)
+    selector_tuple = {selector_type, entity_or_test_selector}
+
+    _submit_form(conn, form, selector_tuple, attrs)
   end
+
+  def submit_form(conn, entity_or_test_selector, nil),
+    do: submit_form(conn, %{}, entity_or_test_selector)
 
   @doc """
   Works like `submit_form/3`. The test_selector is used to find the right form and the
   entity is used to find and fill the inputs correctly.
   """
   @spec submit_form(Plug.Conn.t(), %{}, atom(), binary()) :: Plug.Conn.t()
+  def submit_form(%Plug.Conn{} = conn, %{} = attrs, entity, test_selector) do
+    {form, _} = find_form(conn, test_selector)
+    selector_tuple = {:entity, entity}
 
-  def submit_form(conn, attrs, entity, test_selector),
-    do: dispatch_form(conn, attrs, entity, test_selector)
+    _submit_form(conn, form, selector_tuple, attrs)
+  end
 
   @doc """
   Works like `submit_form/3` but instead of an entity or test_selector it uses
@@ -96,33 +69,18 @@ defmodule TestDispatch do
     {form, _} = find_form(conn, button_text: button_text)
     selector_tuple = {:button_text, button_text}
 
-    _dispatch_form(conn, form, selector_tuple, attrs)
+    _submit_form(conn, form, selector_tuple, attrs)
   end
 
-  @doc """
-  See `click_link/4` for documentation.
-  """
-  @spec dispatch_link(nil | Floki.html_tree(), Plug.Conn.t(), binary(), binary() | nil) ::
-          Plug.Conn.t()
-  @spec dispatch_link(Plug.Conn.t(), binary(), binary() | nil, nil) :: Plug.Conn.t()
-  def dispatch_link(floki_tree \\ nil, conn, test_selector, test_value \\ nil)
-
-  def dispatch_link(nil, %Plug.Conn{} = conn, test_selector, test_value),
-    do: dispatch_link(conn, test_selector, test_value, nil)
-
-  def dispatch_link(floki_tree, %Plug.Conn{} = conn, test_selector, test_value)
-      when is_list(floki_tree) and is_binary(test_selector),
-      do:
-        floki_tree
-        |> find_link(test_selector, test_value)
-        |> _dispatch_link(conn)
-
-  def dispatch_link(%Plug.Conn{} = conn, test_selector, test_value, _tree)
-      when is_binary(test_selector),
-      do:
-        conn
-        |> find_link(test_selector, test_value)
-        |> _dispatch_link(conn)
+  defp _submit_form(conn, form, selector_tuple, attrs) do
+    form
+    |> find_inputs(selector_tuple)
+    |> Enum.map(&input_to_tuple(&1, selector_tuple))
+    |> Enum.reject(&is_nil(&1))
+    |> update_input_values(attrs)
+    |> prepend_entity(selector_tuple)
+    |> send_to_action(form, conn)
+  end
 
   @doc """
   Finds a link by a given conn, test_selector and an optional test_value.
@@ -173,11 +131,30 @@ defmodule TestDispatch do
       :ok
 
   """
+  @spec click_link(nil | Floki.html_tree(), Plug.Conn.t(), binary(), binary() | nil) ::
+          Plug.Conn.t()
 
-  def click_link(tree \\ nil, conn, test_selector, test_value \\ nil),
-    do: dispatch_link(tree, conn, test_selector, test_value)
+  @spec click_link(Plug.Conn.t(), binary(), binary() | nil, nil) :: Plug.Conn.t()
+  def click_link(floki_tree \\ nil, conn, test_selector, test_value \\ nil)
 
-  def _dispatch_link(link, conn) do
+  def click_link(nil, %Plug.Conn{} = conn, test_selector, test_value),
+    do: click_link(conn, test_selector, test_value, nil)
+
+  def click_link(floki_tree, %Plug.Conn{} = conn, test_selector, test_value)
+      when is_list(floki_tree) and is_binary(test_selector),
+      do:
+        floki_tree
+        |> find_link(test_selector, test_value)
+        |> _click_link(conn)
+
+  def click_link(%Plug.Conn{} = conn, test_selector, test_value, _tree)
+      when is_binary(test_selector),
+      do:
+        conn
+        |> find_link(test_selector, test_value)
+        |> _click_link(conn)
+
+  def _click_link(link, conn) do
     endpoint = endpoint_module(conn)
 
     method = floki_attribute(link, "data-method") || "get"

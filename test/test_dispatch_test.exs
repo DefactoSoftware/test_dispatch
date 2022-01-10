@@ -5,5 +5,6 @@ defmodule TestDispatchTest do
   """
 
   use TestDispatch.ConnCase
+
   doctest TestDispatch, import: true, only: [follow_redirect: 2, receive_mail: 2]
 end
