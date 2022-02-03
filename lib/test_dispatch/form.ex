@@ -12,9 +12,7 @@ defmodule TestDispatch.Form do
   def find_inputs(form, {:button_text, button_text}) do
     button = find_buttons(form, button_text)
 
-    if button,
-      do: [button | find_default_inputs(form)],
-      else: find_default_inputs(form)
+    [button | find_default_inputs(form)]
   end
 
   def find_inputs(form, _) do
@@ -31,20 +29,9 @@ defmodule TestDispatch.Form do
 
   def find_buttons(form, button_text),
     do:
-      find_submit_input(form, button_text) ||
-        find_submit_button(form, button_text)
-
-  defp find_submit_button(form, button_text) do
-    form
-    |> Floki.find("button[type=submit]")
-    |> Enum.find(&contains_button_text?(&1, button_text))
-  end
-
-  defp find_submit_input(form, button_text) do
-    form
-    |> Floki.find("input[type=submit]")
-    |> Enum.find(&contains_button_text?(&1, button_text))
-  end
+      form
+      |> Floki.find("button[type=submit], input[type=submit]")
+      |> Enum.find(&contains_button_text?(&1, button_text))
 
   def find_radio_buttons(form, "") do
     radios = Floki.find(form, "input[type=radio]")
@@ -153,11 +140,7 @@ defmodule TestDispatch.Form do
   end
 
   def find_form(%Plug.Conn{status: status}, _),
-    do:
-      raise(
-        Plug.BadRequestError,
-        "The provided conn had the status #{status} that doesn't fall into the 2xx range"
-      )
+    do: raise("The provided conn had the status #{status} that doesn't fall into the 2xx range")
 
   def find_form_by(forms, nil), do: {List.last(forms), nil}
 
@@ -212,28 +195,18 @@ defmodule TestDispatch.Form do
   end
 
   defp contains_button_text?(form, button_text) do
-    input_submit =
-      form
-      |> Floki.find("input[type=submit]")
-      |> Enum.any?(&(text(&1) == button_text))
-
-    button_submit =
-      form
-      |> Floki.find("button[type=submit]")
-      |> Enum.any?(&(text(&1) == button_text))
-
-    input_submit || button_submit
+    form
+    |> Floki.find("button[type=submit], input[type=submit]")
+    |> Enum.any?(&(text(&1) == button_text))
   end
 
   def text(html_tree),
     do: html_tree |> Floki.text() |> String.replace(~r/\s+/, " ") |> String.trim()
 
   defp all_buttons(html_tree) do
-    all_submit_buttons = html_tree |> Floki.find("button[type=submit]")
-    all_submit_inputs = html_tree |> Floki.find("input[type=submit]")
-
-    (all_submit_inputs ++ all_submit_buttons)
-    |> Enum.map(&(text([&1]) <> "\n "))
+    html_tree
+    |> Floki.find("button[type=submit], input[type=submit]")
+    |> Enum.map_join("\n ", &text(&1))
   end
 
   defp deep_merge(map1, map2) when is_map(map1) and is_map(map2) do
