@@ -330,7 +330,7 @@ defmodule TestDispatch.FormTest do
   describe "submit_with_button/4" do
     test "submit with 'Next' and go to the next question", %{conn: conn} do
       assert conn
-             |> get("quiz/1/question/2")
+             |> get("/quiz/1/question/2")
              |> submit_with_button(%{answer_option: "elixir"}, "Next")
              |> follow_redirect
              |> html_response(200) =~ "Question: What is the package manager for Elixir"
@@ -338,10 +338,27 @@ defmodule TestDispatch.FormTest do
 
     test "rejects empty values when a buttons value/name is empty", %{conn: conn} do
       assert conn
-             |> get("quiz/1/question/2")
+             |> get("/quiz/1/question/2")
              |> submit_with_button(%{email: "marcel@defacto.nl"}, "Helpline")
              |> follow_redirect
              |> html_response(200) =~ "Question: Which language is a functional one"
+    end
+
+    test "raises an error when no button by that text was found", %{conn: conn} do
+      raise_text = """
+      No form found for the given button text: Not Found Button
+      Found the button texts:
+
+       Back
+       Next
+       Helpline
+      """
+
+      assert_raise RuntimeError, raise_text, fn ->
+        conn
+        |> get("/quiz/1/question/2")
+        |> submit_with_button(%{email: "marcel@defacto.nl"}, "Not Found Button")
+      end
     end
   end
 end
