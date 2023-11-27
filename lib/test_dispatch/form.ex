@@ -110,10 +110,12 @@ defmodule TestDispatch.Form do
 
   defp resolve_nested(key), do: String.split(key, ["[", "]"], trim: true)
 
+  @spec send_to_action(map() | Keyword.t(), binary(), Plug.Conn.t()) :: Plug.Conn.t()
   def send_to_action(params, form, conn) do
     endpoint = endpoint_module(conn)
     method = get_method_of_form(form)
-    action = floki_attribute(form, "action")
+
+    action = floki_attribute(form, "action") || conn.request_path
 
     dispatch(conn, endpoint, method, action, params)
   end
@@ -131,6 +133,7 @@ defmodule TestDispatch.Form do
   defp downcase(nil), do: nil
   defp downcase(string), do: String.downcase(string)
 
+  @spec find_form(Plug.Conn.t(), binary() | Keyword.t() | tuple()) :: {binary(), atom()}
   def find_form(%Plug.Conn{status: status} = conn, entity_or_test_selector)
       when status in 200..299 or status == 401 do
     conn
